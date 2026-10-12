@@ -1,0 +1,332 @@
+openapi: 3.0.3
+info:
+  title: docflow API
+  version: 0.1.0
+  description: |-
+    Upload receipts and invoices; they are OCR'd and their fields extracted by self-hosted models, each field with a confidence score.
+
+    **Authentication:** send your tenant's API key as `Authorization: Api-Key <key>`.
+paths:
+  /api/v1/documents:
+    get:
+      operationId: v1_documents_list
+      description: List documents, newest first, optionally by status.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - extracted
+          - failed
+          - processing
+          - queued
+      tags:
+      - v1
+      security:
+      - ApiKey: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDocumentList'
+          description: ''
+    post:
+      operationId: v1_documents_create
+      description: |-
+        Upload a document for processing. `201` when new; `200` with the existing document if
+        the same file was uploaded before. `413` if too large, `415` if not a supported type.
+      tags:
+      - v1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadRequest'
+        required: true
+      security:
+      - ApiKey: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResult'
+          description: ''
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResult'
+          description: ''
+  /api/v1/documents/{id}:
+    get:
+      operationId: v1_documents_retrieve
+      description: 'A document with its latest extraction: each field''s value, confidence
+        and checks.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this document.
+        required: true
+      tags:
+      - v1
+      security:
+      - ApiKey: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentDetail'
+          description: ''
+  /api/v1/documents/{id}/reprocess:
+    post:
+      operationId: v1_documents_reprocess_create
+      description: |-
+        Run the document through the current pipeline again, e.g. after a model upgrade.
+        `409` while it is already queued or processing.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this document.
+        required: true
+      tags:
+      - v1
+      security:
+      - ApiKey: []
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+        '409':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+components:
+  schemas:
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        filename:
+          type: string
+          readOnly: true
+        content_type:
+          type: string
+          readOnly: true
+        size_bytes:
+          type: integer
+          readOnly: true
+        page_count:
+          type: integer
+          readOnly: true
+          nullable: true
+        sha256:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+        error:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - content_type
+      - created_at
+      - error
+      - filename
+      - id
+      - page_count
+      - sha256
+      - size_bytes
+      - status
+      - updated_at
+    DocumentDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        filename:
+          type: string
+          readOnly: true
+        content_type:
+          type: string
+          readOnly: true
+        size_bytes:
+          type: integer
+          readOnly: true
+        page_count:
+          type: integer
+          readOnly: true
+          nullable: true
+        sha256:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+        error:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        extraction:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+      required:
+      - content_type
+      - created_at
+      - error
+      - extraction
+      - filename
+      - id
+      - page_count
+      - sha256
+      - size_bytes
+      - status
+      - updated_at
+    PaginatedDocumentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+    StatusEnum:
+      enum:
+      - queued
+      - processing
+      - extracted
+      - failed
+      type: string
+      description: |-
+        * `queued` - Queued
+        * `processing` - Processing
+        * `extracted` - Extracted
+        * `failed` - Failed
+    UploadRequest:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: 'A receipt or invoice: PDF, PNG, JPEG or WebP'
+      required:
+      - file
+    UploadResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        filename:
+          type: string
+          readOnly: true
+        content_type:
+          type: string
+          readOnly: true
+        size_bytes:
+          type: integer
+          readOnly: true
+        page_count:
+          type: integer
+          readOnly: true
+          nullable: true
+        sha256:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+        error:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        duplicate:
+          type: boolean
+          description: True if this tenant already uploaded the same file
+      required:
+      - content_type
+      - created_at
+      - duplicate
+      - error
+      - filename
+      - id
+      - page_count
+      - sha256
+      - size_bytes
+      - status
+      - updated_at
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: '`Api-Key dfk_...`, issued per tenant with `manage.py create_tenant`.'
