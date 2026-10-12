@@ -29,3 +29,19 @@ def test_filesystem_storage_refuses_keys_outside_its_root(tmp_path: Path) -> Non
 
 def test_keys_are_per_tenant_and_content_addressed() -> None:
     assert document_key("t1", "ab12") == "tenants/t1/documents/ab12"
+
+
+def test_ensure_bucket_creates_it_once(settings: object) -> None:
+    from django.core.management import call_command
+    from django.test import override_settings
+
+    from documents.storage import get_storage
+
+    with mock_aws(), override_settings(STORAGE_BACKEND="s3", S3_BUCKET="docflow-test", S3_ENDPOINT_URL=None):
+        get_storage.cache_clear()
+        call_command("ensure_bucket")
+        call_command("ensure_bucket")
+
+        names = [b["Name"] for b in boto3.client("s3", region_name="us-east-1").list_buckets()["Buckets"]]
+        assert names == ["docflow-test"]
+    get_storage.cache_clear()

@@ -123,11 +123,11 @@ MAX_PAGES = int(env("MAX_PAGES", "10"))
 DATA_UPLOAD_MAX_MEMORY_SIZE = MAX_UPLOAD_BYTES + 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = MAX_UPLOAD_BYTES + 1024 * 1024
 
-# Document storage: "s3" (S3 or MinIO) or "filesystem" (local development and tests).
+# Document storage: "s3" (AWS S3 or any S3-compatible server) or "filesystem" (local development and tests).
 STORAGE_BACKEND = env("STORAGE_BACKEND", "filesystem")
 STORAGE_ROOT = Path(env("STORAGE_ROOT", str(BASE_DIR / ".storage")))
 S3_BUCKET = env("S3_BUCKET", "docflow-documents")
-S3_ENDPOINT_URL = env("S3_ENDPOINT_URL") or None  # MinIO locally; empty for AWS
+S3_ENDPOINT_URL = env("S3_ENDPOINT_URL") or None  # RustFS locally; empty for AWS
 
 # Models, served by Ollama locally and vLLM for the GPU benchmark.
 OLLAMA_URL = env("OLLAMA_URL", "http://127.0.0.1:11434")
