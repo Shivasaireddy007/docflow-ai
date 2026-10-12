@@ -1,0 +1,15 @@
+# Runs the stack against the Ollama stand-in (no model weights), for CI:
+#   docker compose -f docker-compose.yml -f docker-compose.ci.yml up --build -d
+services:
+  ollama-stub:
+    image: python:3.12-alpine
+    command: ["python", "/stub/ollama_stub.py"]
+    volumes:
+      - ./e2e:/stub:ro
+
+  api:
+    environment:
+      OLLAMA_URL: http://ollama-stub:11434
+  worker:
+    environment:
+      OLLAMA_URL: http://ollama-stub:11434

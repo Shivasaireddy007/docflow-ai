@@ -1,0 +1,59 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: docflow
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 5s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/docflow
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.0"
+      - run: uv sync --locked
+      - name: Format and lint
+        run: uv run ruff format --check . && uv run ruff check .
+      - name: Type check (strict)
+        run: uv run mypy .
+      - name: No missing migrations
+        run: uv run python manage.py makemigrations --check --dry-run
+      - name: Tests
+        run: uv run pytest -rs
+      - name: OpenAPI spec is up to date
+        run: |
+          uv run python manage.py spectacular --file /tmp/openapi.yaml --validate
+          diff -u ../docs/openapi.yaml /tmp/openapi.yaml
+
+  stack:
+    # The whole stack in Docker Compose, with an Ollama stand-in instead of model weights.
+    runs-on: ubuntu-latest
+    needs: backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start the stack
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml up --build -d
+          for i in $(seq 1 60); do curl -fsS http://localhost:8000/ready > /dev/null 2>&1 && break; sleep 2; done
+      - name: Smoke test
+        run: |
+          key=$(docker compose exec -T api python manage.py create_tenant "CI" | sed -n 's/^API key (shown once): //p')
+          scripts/smoke-test.sh "$key"
+      - name: Logs on failure
+        if: failure()
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml logs --tail=80
