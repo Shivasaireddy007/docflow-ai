@@ -1,0 +1,88 @@
+# The whole pipeline except the models:  docker compose up --build -d
+# Then create a tenant:                   docker compose exec api python manage.py create_tenant "Acme"
+#
+# Ollama runs on the host (`ollama serve`), where it can use the Mac's GPU; Docker on macOS
+# can't. API at http://localhost:8000/api/docs, MinIO console at http://localhost:9001.
+
+x-app: &app
+  build: ./backend
+  image: docflow-api
+  environment:
+    DATABASE_URL: postgresql://docflow:docflow@postgres:5432/docflow
+    SECRET_KEY: ${SECRET_KEY:-local-development-only-not-secret}
+    ALLOWED_HOSTS: localhost,127.0.0.1,api
+    STORAGE_BACKEND: s3
+    S3_BUCKET: docflow-documents
+    S3_ENDPOINT_URL: http://minio:9000
+    AWS_ACCESS_KEY_ID: docflow
+    AWS_SECRET_ACCESS_KEY: docflow-secret
+    AWS_DEFAULT_REGION: us-east-1
+    OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+    OCR_MODEL: ${OCR_MODEL:-qwen2.5vl:3b}
+    EXTRACTION_MODEL: ${EXTRACTION_MODEL:-qwen2.5:7b}
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  depends_on:
+    migrate:
+      condition: service_completed_successfully
+    bucket:
+      condition: service_completed_successfully
+  restart: unless-stopped
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: docflow
+      POSTGRES_PASSWORD: docflow
+      POSTGRES_DB: docflow
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docflow"]
+      interval: 5s
+      retries: 20
+
+  minio:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: docflow
+      MINIO_ROOT_PASSWORD: docflow-secret
+    ports:
+      - "9001:9001"
+    volumes:
+      - minio:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      retries: 20
+
+  bucket:
+    image: minio/mc:RELEASE.2025-04-16T18-13-26Z
+    entrypoint: ["sh", "-c", "mc alias set local http://minio:9000 docflow docflow-secret && mc mb --ignore-existing local/docflow-documents"]
+    depends_on:
+      minio:
+        condition: service_healthy
+    restart: "no"
+
+  migrate:
+    <<: *app
+    command: ["python", "manage.py", "migrate", "--noinput"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    <<: *app
+    ports:
+      - "8000:8000"
+
+  worker:
+    <<: *app
+    command: ["python", "manage.py", "run_worker"]
+
+volumes:
+  postgres:
+  minio:
