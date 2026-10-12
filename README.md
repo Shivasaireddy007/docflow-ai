@@ -19,7 +19,7 @@ Built in stages; each is complete and tested before the next starts.
 
 | Stage | Scope | Status |
 |---|---|---|
-| 1 | Django REST API, tenants and API keys, uploads to S3/MinIO, OCR and extraction with self-hosted models, confidence checks, job queue, Docker, CI | ✅ Done |
+| 1 | Django REST API, tenants and API keys, uploads to S3 (RustFS locally), OCR and extraction with self-hosted models, confidence checks, job queue, Docker, CI | ✅ Done |
 | 2 | Versioned validation rules, auto-approve vs. human review, React reviewer UI, audit trail | Next |
 | 3 | Content-addressed result cache, rate limiting, tracing, evaluation on a labelled public dataset | |
 | 4 | AWS with Terraform: Step Functions and container Lambdas, DynamoDB, RDS, KMS, canary deploys, SLO alarms | |
@@ -29,7 +29,7 @@ Built in stages; each is complete and tested before the next starts.
 
 ```mermaid
 flowchart LR
-    U[Upload] -->|"type from bytes, SHA-256"| S[(S3 / MinIO)]
+    U[Upload] -->|"type from bytes, SHA-256"| S[(S3)]
     U --> Q[(PostgreSQL<br/>jobs)]
     Q -->|"SKIP LOCKED"| W[Worker]
     W --> O[OCR<br/>vision model]
@@ -120,7 +120,7 @@ curl -H "Authorization: Api-Key <key>" -F "file=@receipt.jpg" http://127.0.0.1:8
 ### With Docker
 
 ```bash
-docker compose up --build -d     # PostgreSQL, MinIO, API, worker; Ollama runs on the host
+docker compose up --build -d     # PostgreSQL, S3-compatible storage (RustFS), API, worker; Ollama on the host
 docker compose exec api python manage.py create_tenant "Acme"
 scripts/smoke-test.sh <key>
 ```
