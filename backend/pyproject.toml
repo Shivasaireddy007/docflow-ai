@@ -1,0 +1,68 @@
+[project]
+name = "docflow"
+version = "0.1.0"
+description = "Document intelligence pipeline: OCR, LLM extraction, validation and human review"
+authors = [
+    { name = "shivasaireddy", email = "shivasaireddy2505@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "boto3>=1.43.111",
+    "django>=6.1.2",
+    "django-stubs-ext>=6.1.2",
+    "djangorestframework>=3.18.3",
+    "drf-spectacular>=0.30.0",
+    "gunicorn>=26.2.0",
+    "httpx>=0.28.1",
+    "pillow>=12.3.0",
+    "psycopg[binary]>=3.3.6",
+    "pypdfium2>=5.14.0",
+    "whitenoise>=6.12.0",
+]
+
+[dependency-groups]
+dev = [
+    "django-stubs[compatible-mypy]>=6.1.2",
+    "djangorestframework-stubs>=3.18.1",
+    "moto[s3]>=5.2.4",
+    "mypy>=2.4.0",
+    "pytest>=9.1.1",
+    "pytest-django>=4.14.0",
+    "ruff>=0.17.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "DJ", "S"]
+ignore = ["RUF012"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106"]
+"*/migrations/*" = ["E501", "RUF", "I"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+testpaths = ["tests"]
+addopts = "-q"
+markers = ["ollama: needs a running Ollama server (OLLAMA_TEST_URL)"]
+# Static files are collected only in the Docker image.
+filterwarnings = ["ignore:No directory at:UserWarning"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+exclude = ["migrations/"]
+
+[[tool.mypy.overrides]]
+module = ["pypdfium2.*", "moto.*", "boto3.*", "botocore.*"]
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "config.settings"
