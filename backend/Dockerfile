@@ -16,6 +16,8 @@ ENV PYTHONUNBUFFERED=1 PATH="/app/.venv/bin:$PATH"
 RUN useradd --system --uid 10001 --home /app app
 WORKDIR /app
 COPY --from=build --chown=10001:10001 /app /app
+# Gunicorn's processes share Prometheus metrics here (gunicorn.conf.py); /app itself stays root-owned.
+RUN install -d -o 10001 -g 10001 /app/.prometheus
 USER 10001
 EXPOSE 8000
 HEALTHCHECK --interval=10s --timeout=3s --retries=5 \

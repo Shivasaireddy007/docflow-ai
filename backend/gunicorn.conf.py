@@ -17,8 +17,12 @@ accesslog = "-"
 
 
 def on_starting(server: Any) -> None:
-    shutil.rmtree(METRICS_DIR, ignore_errors=True)
+    """Empties the folder (files from a previous run would be counted again); the folder itself
+    may sit in a directory the app can't write to, so it is kept rather than recreated."""
     os.makedirs(METRICS_DIR, exist_ok=True)
+    for name in os.listdir(METRICS_DIR):
+        path = os.path.join(METRICS_DIR, name)
+        shutil.rmtree(path) if os.path.isdir(path) else os.remove(path)
 
 
 def child_exit(server: Any, worker: Any) -> None:
