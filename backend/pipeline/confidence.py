@@ -53,17 +53,17 @@ def _compact(text: str) -> str:
 
 
 def amount_spellings(value: float) -> set[str]:
-    """How an amount may be printed: 12500 -> 12500, 12,500, 12.500, 12 500; 12.5 -> 12.50, 12,50."""
+    """How an amount may be printed: 12500 -> 12500, 12,500, 12.500, 12 500; 12.5 -> 12.50, 12,50.
+    A whole amount may also carry zero cents: 193 -> 193.00 (ringgit and dollar receipts do)."""
     whole = int(value)
     cents = round((value - whole) * 100)
     grouped = f"{whole:,}"
     spellings = (
         {str(whole), grouped, grouped.replace(",", "."), grouped.replace(",", " ")} if cents == 0 else set()
     )
-    if cents or value != whole:
-        decimals = f"{cents:02d}"
-        spellings |= {f"{whole}.{decimals}", f"{whole},{decimals}", f"{grouped}.{decimals}"}
-        spellings.add(f"{grouped.replace(',', '.')},{decimals}")
+    decimals = f"{cents:02d}"
+    spellings |= {f"{whole}.{decimals}", f"{whole},{decimals}", f"{grouped}.{decimals}"}
+    spellings.add(f"{grouped.replace(',', '.')},{decimals}")
     return spellings
 
 

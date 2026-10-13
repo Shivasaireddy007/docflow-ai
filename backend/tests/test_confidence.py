@@ -60,6 +60,9 @@ def test_missing_fields_have_no_score() -> None:
         (56100.0, "TOTAL 56,100", True),
         (56100.0, "TOTAL Rp56100", True),
         (12.5, "Total $12.50", True),
+        (193.0, "TOTAL 193.00", True),  # whole ringgit, printed with cents
+        (1193.0, "TOTAL RM1,193.00", True),
+        (193.0, "TOTAL 193.50", False),
         (100.0, "TOTAL 56.100", False),  # inside another number
         (2500.0, "Qty 2\n500", False),  # numbers on separate lines
     ],
