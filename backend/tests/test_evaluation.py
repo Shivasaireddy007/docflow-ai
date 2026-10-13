@@ -34,7 +34,7 @@ def test_labels_that_repeat_a_group_use_the_first() -> None:
 
 
 def test_field_scores_separate_precision_from_recall() -> None:
-    blank = dict.fromkeys(truth.EVALUATED_FIELDS)
+    blank: dict[str, truth.Value] = dict.fromkeys(truth.EVALUATED_FIELDS)
     rows = [
         metrics.row_for(truth.Truth({**blank, "total": 100, "tax": 10}), {"total": 100, "subtotal": 90}, []),
         metrics.row_for(truth.Truth({**blank, "total": 200}), {"total": 250}, []),
@@ -96,3 +96,23 @@ def test_the_report_renders() -> None:
     assert "| Approved automatically | 1 (50%) |" in markdown
     assert "| 0.90 | 1 (50%) | 0 | 0% |" in markdown
     assert "about 4.2 hours" in markdown
+
+
+def test_sroie_labels_cover_merchant_date_and_total() -> None:
+    parsed = truth.parse_sroie(
+        {"company": "OJC MARKETING SDN BHD", "date": "15/01/2019", "address": "x", "total": "193.00"}
+    )
+
+    assert parsed.fields == {
+        "merchant_name": "OJC MARKETING SDN BHD",
+        "receipt_date": "2019-01-15",
+        "total": 193.0,
+    }
+
+
+def test_text_matches_ignore_case_punctuation_and_small_ocr_slips() -> None:
+    assert metrics.matches("OJC Marketing Sdn. Bhd.", "OJC MARKETING SDN BHD")
+    assert metrics.matches("0JC MARKETING SDN BHD", "OJC MARKETING SDN BHD"), "one misread letter"
+    assert not metrics.matches("ABC TRADING", "OJC MARKETING SDN BHD")
+    assert metrics.matches("2019-01-15", "2019-01-15") and not metrics.matches("2019-01-16", "2019-01-15")
+    assert metrics.matches(193, 193.0) and not metrics.matches("193", 193.0)

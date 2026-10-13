@@ -3,6 +3,8 @@
 from typing import Any
 
 LABELS = {
+    "merchant_name": "Merchant",
+    "receipt_date": "Date",
     "total": "Total",
     "subtotal": "Subtotal",
     "tax": "Tax",

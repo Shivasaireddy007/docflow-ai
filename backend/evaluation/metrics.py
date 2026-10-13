@@ -1,19 +1,41 @@
 """Scoring extractions against labels, and summarising a run."""
 
+import re
 import statistics
 from collections import Counter
 from dataclasses import asdict, dataclass
+from difflib import SequenceMatcher
 from typing import Any
 
-from evaluation.truth import EVALUATED_FIELDS, Truth
+from evaluation.truth import Truth
 
 TOLERANCE = 0.5  # amounts are whole rupiah; anything closer than half a unit is the same number
+
+
+TEXT_MATCH = 0.9  # company names: "OJC MARKETING SDN BHD" vs "OJC MARKETING SDN. BHD."
 
 
 def same(a: float | None, b: float | None) -> bool:
     if a is None or b is None:
         return a is None and b is None
     return abs(a - b) < TOLERANCE
+
+
+def _letters(text: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", text.lower())
+
+
+def matches(got: Any, want: Any) -> bool:
+    """Amounts within half a unit; dates exactly; text ignoring case and punctuation, with a
+    little room for an OCR slip."""
+    if got is None or want is None:
+        return got is None and want is None
+    if isinstance(want, float):
+        return isinstance(got, int | float) and same(float(got), want)
+    if isinstance(got, float):
+        return False
+    a, b = _letters(str(got)), _letters(str(want))
+    return a == b or SequenceMatcher(None, a, b).ratio() >= TEXT_MATCH
 
 
 @dataclass
@@ -36,13 +58,13 @@ class FieldScore:
 
 def score_fields(rows: list[dict[str, Any]]) -> dict[str, FieldScore]:
     scores = {}
-    for name in EVALUATED_FIELDS:
+    for name in rows[0]["truth"] if rows else []:
         labelled = extracted = correct = 0
         for row in rows:
             want, got = row["truth"][name], row["extracted"][name]
             labelled += want is not None
             extracted += got is not None
-            correct += want is not None and same(got, want)
+            correct += want is not None and matches(got, want)
         scores[name] = FieldScore(labelled, extracted, correct)
     return scores
 
@@ -67,9 +89,9 @@ def percentile(values: list[float], p: int) -> float | None:
 def row_for(truth: Truth, extracted: dict[str, Any], item_amounts: list[float]) -> dict[str, Any]:
     return {
         "truth": truth.fields,
-        "extracted": {name: extracted.get(name) for name in EVALUATED_FIELDS},
+        "extracted": {name: extracted.get(name) for name in truth.fields},
         "total_correct": truth.fields["total"] is not None
-        and same(extracted.get("total"), truth.fields["total"]),
+        and matches(extracted.get("total"), truth.fields["total"]),
         "items": score_items(item_amounts, truth.item_amounts),
     }
 

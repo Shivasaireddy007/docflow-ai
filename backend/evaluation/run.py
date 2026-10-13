@@ -43,13 +43,14 @@ from pipeline.providers import (  # noqa: E402
 from review import rules  # noqa: E402
 
 ROWS_URL = "https://datasets-server.huggingface.co/rows"
-DATASET = "naver-clova-ix/cord-v2"
 TENANT = "evaluation"
 THRESHOLDS = [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0]
 
 
-def download(directory: Path, split: str, limit: int) -> list[tuple[str, Path, dict[str, Any]]]:
-    """CORD receipts and labels, fetched once and kept in `directory`."""
+def download(
+    dataset: truth.Dataset, directory: Path, split: str, limit: int
+) -> list[tuple[str, Path, dict[str, Any]]]:
+    """A dataset's receipts and labels, fetched once and kept in `directory`."""
     directory.mkdir(parents=True, exist_ok=True)
     samples = []
     with httpx.Client(timeout=60, follow_redirects=True) as http:
@@ -57,7 +58,7 @@ def download(directory: Path, split: str, limit: int) -> list[tuple[str, Path, d
             page = http.get(
                 ROWS_URL,
                 params={
-                    "dataset": DATASET,
+                    "dataset": dataset.hf_id,
                     "config": "default",
                     "split": split,
                     "offset": offset,
@@ -71,14 +72,12 @@ def download(directory: Path, split: str, limit: int) -> list[tuple[str, Path, d
                 if not image.exists():
                     image.write_bytes(http.get(row["row"]["image"]["src"]).content)
                 if not label.exists():
-                    label.write_text(
-                        json.dumps(json.loads(row["row"]["ground_truth"])["gt_parse"], ensure_ascii=False)
-                    )
+                    label.write_text(json.dumps(dataset.label(row["row"]), ensure_ascii=False))
                 samples.append((name, image, json.loads(label.read_text())))
     return samples
 
 
-def evaluate_one(name: str, image: Path, gt: dict[str, Any]) -> dict[str, Any]:
+def evaluate_one(dataset: truth.Dataset, name: str, image: Path, gt: dict[str, Any]) -> dict[str, Any]:
     ocr, extract = default_providers()
     cache = get_result_cache()
     data = image.read_bytes()
@@ -104,7 +103,8 @@ def evaluate_one(name: str, image: Path, gt: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "name": name,
-        **metrics.row_for(truth.parse(gt), receipt.fields, item_amounts),
+        **metrics.row_for(dataset.parse(gt), receipt.fields, item_amounts),
+        "scored": fields,  # value, confidence and checks per field: what calibration learns from
         "confidence": document_confidence,
         "auto_approved": all(r.passed for r in results),
         "other_rules_pass": others_pass,
@@ -115,12 +115,13 @@ def evaluate_one(name: str, image: Path, gt: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def unreadable(name: str, gt: dict[str, Any], error: str) -> dict[str, Any]:
+def unreadable(dataset: truth.Dataset, name: str, gt: dict[str, Any], error: str) -> dict[str, Any]:
     """A receipt the models couldn't read even with anti-repetition sampling: nothing extracted,
     so it would go to a person."""
     return {
         "name": name,
-        **metrics.row_for(truth.parse(gt), {}, []),
+        **metrics.row_for(dataset.parse(gt), {}, []),
+        "scored": {},
         "confidence": 0.0,
         "auto_approved": False,
         "other_rules_pass": False,
@@ -132,12 +133,14 @@ def unreadable(name: str, gt: dict[str, Any], error: str) -> dict[str, Any]:
     }
 
 
-def with_retries(name: str, image: Path, gt: dict[str, Any], attempts: int = 4) -> dict[str, Any]:
+def with_retries(
+    dataset: truth.Dataset, name: str, image: Path, gt: dict[str, Any], attempts: int = 4
+) -> dict[str, Any]:
     for attempt in range(1, attempts + 1):
         try:
-            return evaluate_one(name, image, gt)
+            return evaluate_one(dataset, name, image, gt)
         except ModelRepetition as exc:
-            return unreadable(name, gt, str(exc))
+            return unreadable(dataset, name, gt, str(exc))
         except ModelError as exc:
             if attempt == attempts:
                 raise
@@ -192,19 +195,19 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
+    root = Path(__file__).resolve().parents[2]
+    parser.add_argument("--dataset", choices=sorted(truth.DATASETS), default="cord")
     parser.add_argument("--split", default="test")
     parser.add_argument("--limit", type=int, default=100)
-    parser.add_argument(
-        "--data", type=Path, default=Path(__file__).resolve().parents[2] / "data" / "cord-eval"
-    )
-    parser.add_argument(
-        "--out", type=Path, default=Path(__file__).resolve().parents[2] / "docs" / "evaluation"
-    )
+    parser.add_argument("--data", type=Path, help="Where receipts are kept (default data/<dataset>-eval)")
+    parser.add_argument("--out", type=Path, default=root / "docs" / "evaluation")
     parser.add_argument("--fresh", action="store_true", help="Ignore saved progress and start over")
     args = parser.parse_args()
+    dataset = truth.DATASETS[args.dataset]
+    args.data = args.data or root / "data" / f"{dataset.name}-eval"
 
-    samples = download(args.data, args.split, args.limit)
-    print(f"Evaluating {len(samples)} receipts with {pipeline_version()}")
+    samples = download(dataset, args.data, args.split, args.limit)
+    print(f"Evaluating {len(samples)} {dataset.name} receipts with {pipeline_version()}")
     progress = args.data / f"progress-{sha256(pipeline_version().encode())[:12]}.jsonl"
     if args.fresh:
         progress.unlink(missing_ok=True)
@@ -220,7 +223,7 @@ def main() -> None:
         if name in done:
             rows.append(done[name])
             continue
-        row = with_retries(name, image, gt)
+        row = with_retries(dataset, name, image, gt)
         with progress.open("a") as saved:
             saved.write(json.dumps(row) + "\n")
         rows.append(row)
@@ -229,12 +232,12 @@ def main() -> None:
               f"{row['ocr_ms'] / 1000:.1f}s+{row['extraction_ms'] / 1000:.1f}s", flush=True)  # fmt: skip
 
     print("Second pass (warm cache)")
-    warm = [with_retries(name, image, gt) for name, image, gt in samples]
+    warm = [with_retries(dataset, name, image, gt) for name, image, gt in samples]
 
     result = {
         "run": {
             "date": datetime.now(UTC).isoformat(timespec="seconds"),
-            "dataset": f"{DATASET} ({args.split}, {len(samples)} receipts)",
+            "dataset": f"{dataset.hf_id} ({args.split}, {len(samples)} receipts)",
             "pipeline_version": pipeline_version(),
             "rules": rules.DEFAULT_RULES,
             "machine": f"{platform.machine()} {platform.system()} {platform.release()}",
