@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "tenants",
     "documents",
+    "review",
 ]
 
 MIDDLEWARE = [
@@ -97,8 +98,12 @@ STORAGES = {
 }
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": ["tenants.auth.ApiKeyAuthentication"],
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+    # Machines use API keys; reviewers sign in and use a session cookie (CSRF-protected).
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "tenants.auth.ApiKeyAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": ["tenants.access.HasTenant"],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 25,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -116,6 +121,14 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
 }
+
+# Reviewer sessions: the web app is served from the same origin as the API.
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_AGE = 12 * 60 * 60
+SESSION_COOKIE_SECURE = env_bool("SECURE_COOKIES")
+CSRF_COOKIE_SECURE = env_bool("SECURE_COOKIES")
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in env("CSRF_TRUSTED_ORIGINS").split(",") if o.strip()]
 
 # Uploads
 MAX_UPLOAD_BYTES = int(env("MAX_UPLOAD_BYTES", str(10 * 1024 * 1024)))
