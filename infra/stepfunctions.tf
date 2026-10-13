@@ -6,6 +6,7 @@ resource "aws_sfn_state_machine" "pipeline" {
     ocr_arn               = aws_lambda_alias.live["ocr"].arn
     extract_arn           = aws_lambda_alias.live["extract"].arn
     decide_arn            = aws_lambda_alias.live["decide"].arn
+    report_failure_arn    = aws_lambda_alias.live["report_failure"].arn
     results_table         = aws_dynamodb_table.results.name
     dead_letter_queue_url = aws_sqs_queue.dead_letters.url
     model_retry_seconds   = var.model_retry_seconds

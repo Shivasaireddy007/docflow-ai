@@ -65,10 +65,10 @@
       "OutputPath": "$.Payload",
       "Retry": [
         {
-          "ErrorEquals": ["Lambda.ServiceException", "Lambda.TooManyRequestsException", "Lambda.SdkClientException"],
-          "IntervalSeconds": 2,
+          "ErrorEquals": ["CallbackError", "Lambda.ServiceException", "Lambda.TooManyRequestsException", "Lambda.SdkClientException"],
+          "IntervalSeconds": 5,
           "BackoffRate": 2,
-          "MaxAttempts": 3,
+          "MaxAttempts": 5,
           "JitterStrategy": "FULL"
         }
       ],
@@ -92,6 +92,24 @@
         "ExpressionAttributeValues": { ":failed": { "S": "failed" }, ":error": { "S.$": "$.error.Error" } }
       },
       "ResultPath": null,
+      "Next": "Report failure"
+    },
+    "Report failure": {
+      "Type": "Task",
+      "Comment": "Tells the review app, so the document shows as failed there. Best effort: the dead-letter queue keeps it either way.",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": { "FunctionName": "${report_failure_arn}", "Payload.$": "$" },
+      "ResultPath": null,
+      "Retry": [
+        {
+          "ErrorEquals": ["CallbackError", "Lambda.ServiceException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 5,
+          "BackoffRate": 2,
+          "MaxAttempts": 3,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": null, "Next": "Send to dead-letter queue" }],
       "Next": "Send to dead-letter queue"
     },
     "Send to dead-letter queue": {

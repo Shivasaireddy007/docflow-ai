@@ -85,6 +85,12 @@ variable "log_retention_days" {
   default = 30
 }
 
+variable "review_app_url" {
+  description = "Base URL of the review app (e.g. https://review.example.com). Set it and the pipeline reports each result there and the app applies the rules; empty runs the pipeline standalone with rules from the bucket."
+  type        = string
+  default     = ""
+}
+
 variable "protect_data" {
   description = "Deletion protection on the results table. Set false (and apply) before `terraform destroy`."
   type        = bool

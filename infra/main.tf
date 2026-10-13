@@ -23,5 +23,8 @@ locals {
     ocr     = { timeout = 300, memory = 512, concurrency = var.model_concurrency }
     extract = { timeout = 120, memory = 512, concurrency = var.model_concurrency }
     decide  = { timeout = 60, memory = 512, concurrency = null }
+    # The failure path: tells the review app a document failed, so it isn't left waiting.
+    report_failure = { timeout = 30, memory = 256, concurrency = null }
   }
+  callback_url = var.review_app_url == "" ? "" : "${trimsuffix(var.review_app_url, "/")}/api/v1/internal/pipeline-results"
 }

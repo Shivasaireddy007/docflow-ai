@@ -22,6 +22,7 @@
           "OCR": "Read",
           "Extract fields": "AlwaysFails",
           "Mark failed": "Updated",
+          "Report failure": "Reported",
           "Send to dead-letter queue": "Sent"
         },
         "UnusableUpload": {
@@ -59,6 +60,9 @@
     },
     "Updated": {
       "0": { "Return": {} }
+    },
+    "Reported": {
+      "0": { "Return": { "StatusCode": 200, "Payload": {} } }
     },
     "Sent": {
       "0": { "Return": { "MessageId": "00000000-0000-0000-0000-000000000000" } }

@@ -48,6 +48,12 @@ mock_provider "aws" {
   mock_resource "aws_iam_openid_connect_provider" {
     defaults = { arn = "arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com" }
   }
+  mock_resource "aws_secretsmanager_secret" {
+    defaults = { arn = "arn:aws:secretsmanager:ap-south-1:123456789012:secret:docflow-demo-callback-AbCdEf", id = "arn:aws:secretsmanager:ap-south-1:123456789012:secret:docflow-demo-callback-AbCdEf" }
+  }
+  mock_resource "aws_iam_policy" {
+    defaults = { arn = "arn:aws:iam::123456789012:policy/docflow-demo-review-app" }
+  }
   mock_resource "aws_ecr_repository" {
     defaults = { arn = "arn:aws:ecr:ap-south-1:123456789012:repository/docflow-demo-pipeline", repository_url = "123456789012.dkr.ecr.ap-south-1.amazonaws.com/docflow-demo-pipeline" }
   }
@@ -160,4 +166,41 @@ run "unknown_model_apis_are_refused" {
     model_api = "bedrock"
   }
   expect_failures = [var.model_api]
+}
+
+run "standalone_unless_a_review_app_is_given" {
+  command = apply
+
+  assert {
+    condition     = aws_lambda_function.step["decide"].environment[0].variables["CALLBACK_URL"] == ""
+    error_message = "Without a review app the pipeline decides on its own."
+  }
+  assert {
+    condition     = contains(keys(jsondecode(aws_sfn_state_machine.pipeline.definition).States), "Report failure")
+    error_message = "Failures are reported (a no-op when standalone)."
+  }
+}
+
+run "integrated_with_the_review_app" {
+  command = apply
+  variables {
+    review_app_url = "https://review.example.com/"
+  }
+
+  assert {
+    condition     = aws_lambda_function.step["decide"].environment[0].variables["CALLBACK_URL"] == "https://review.example.com/api/v1/internal/pipeline-results"
+    error_message = "Reports go to the app's callback endpoint."
+  }
+  assert {
+    condition     = aws_secretsmanager_secret.callback.kms_key_id != null && length(random_password.callback.result) == 48
+    error_message = "The callback secret is long and encrypted with the data key."
+  }
+  assert {
+    condition     = contains(jsondecode(aws_sfn_state_machine.pipeline.definition).States["Decide"].Retry[0].ErrorEquals, "CallbackError")
+    error_message = "A review app that is briefly down is retried."
+  }
+  assert {
+    condition     = jsondecode(aws_iam_policy.review_app.policy).Statement[1].Action == "states:StartExecution"
+    error_message = "The review app can start reprocessing and nothing more on the state machine."
+  }
 }

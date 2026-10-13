@@ -100,7 +100,13 @@ def test_a_model_that_keeps_failing_ends_in_the_dead_letter_queue(machine: tuple
 
     assert status == "FAILED"
     assert task_failures(events) == 5, "the first try and four retries (MaxAttempts counts retries)"
-    assert entered(events)[-4:] == ["Failed?", "Mark failed", "Send to dead-letter queue", "Failed"]
+    assert entered(events)[-5:] == [
+        "Failed?",
+        "Mark failed",
+        "Report failure",
+        "Send to dead-letter queue",
+        "Failed",
+    ]
 
 
 def test_an_unusable_upload_fails_at_once_without_retries(machine: tuple[Any, str]) -> None:

@@ -7,7 +7,7 @@ set -euo pipefail
 IMAGE="$1"
 PREFIX="${2:-docflow-demo}"
 
-for step in prepare ocr extract decide; do
+for step in prepare ocr extract decide report_failure; do
   fn="$PREFIX-$step"
   echo "== $fn"
   aws lambda update-function-code --function-name "$fn" --image-uri "$IMAGE" --output text --query LastUpdateStatus > /dev/null

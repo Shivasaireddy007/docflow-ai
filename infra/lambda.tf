@@ -32,6 +32,8 @@ resource "aws_lambda_function" "step" {
       DJANGO_SETTINGS_MODULE = "config.settings"
       SECRET_KEY             = "unused-by-lambda-steps"
       RESULT_CACHE_ENABLED   = "true"
+      CALLBACK_URL           = local.callback_url
+      CALLBACK_SECRET_ARN    = aws_secretsmanager_secret.callback.arn
     }
   }
 
@@ -110,6 +112,11 @@ data "aws_iam_policy_document" "step" {
     sid       = "ResultsAndCache"
     actions   = ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DeleteItem"]
     resources = [aws_dynamodb_table.results.arn, aws_dynamodb_table.cache.arn]
+  }
+  statement {
+    sid       = "CallbackSecret"
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = [aws_secretsmanager_secret.callback.arn]
   }
   statement {
     sid       = "UseTheDataKey"

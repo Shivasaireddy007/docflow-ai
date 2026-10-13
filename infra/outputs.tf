@@ -20,6 +20,16 @@ output "deploy_role_arn" {
   value       = aws_iam_role.deploy.arn
 }
 
+output "callback_secret_arn" {
+  description = "The review app's CALLBACK_SECRET is this secret's value."
+  value       = aws_secretsmanager_secret.callback.arn
+}
+
+output "review_app_policy_arn" {
+  description = "Attach to the review app's IAM role or user (with PROCESSING_BACKEND=stepfunctions)."
+  value       = aws_iam_policy.review_app.arn
+}
+
 output "dead_letter_queue_url" {
   value = aws_sqs_queue.dead_letters.url
 }
