@@ -20,6 +20,8 @@ class ExtractionSerializer(serializers.ModelSerializer[Extraction]):
             "ocr_text",
             "ocr_ms",
             "extraction_ms",
+            "ocr_cached",
+            "extraction_cached",
             "created_at",
         ]
 

@@ -98,6 +98,8 @@ class Extraction(models.Model):
     confidence = models.FloatField(help_text="Lowest confidence among the fields that were found")
     ocr_ms = models.PositiveIntegerField()
     extraction_ms = models.PositiveIntegerField()
+    ocr_cached = models.BooleanField(default=False, help_text="OCR came from the result cache")
+    extraction_cached = models.BooleanField(default=False, help_text="Fields came from the result cache")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -87,6 +87,7 @@ def execute(job: Job) -> None:
         pipeline_version=extraction.pipeline_version,
         confidence=extraction.confidence,
         ms=extraction.ocr_ms + extraction.extraction_ms,
+        cached={"ocr": extraction.ocr_cached, "extraction": extraction.extraction_cached},
     )
     decide_automatically(document, extraction)  # sets the document's status
     Job.objects.filter(pk=job.pk).update(

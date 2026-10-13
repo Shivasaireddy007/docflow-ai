@@ -1,4 +1,5 @@
 import io
+import os
 from collections.abc import Callable, Iterator
 from pathlib import Path
 from typing import Any
@@ -8,6 +9,7 @@ from django.test import override_settings
 from PIL import Image, ImageDraw
 from rest_framework.test import APIClient
 
+from core.redis import get_redis
 from documents.storage import get_storage
 from pipeline import run
 from tenants.models import ApiKey, Tenant
@@ -35,6 +37,19 @@ RECEIPT_FIELDS: dict[str, Any] = {
         {"description": "Roti Bakar", "quantity": 1, "unit_price": 15000, "amount": 15000},
     ],
 }
+
+
+@pytest.fixture(autouse=True)
+def isolated_redis() -> Iterator[None]:
+    """A Redis database of its own, emptied for every test. The result cache is off unless a
+    test turns it on: fake models answer the same text for different files, which the cache
+    would (rightly) treat as the same content."""
+    url = os.environ.get("REDIS_TEST_URL", "redis://127.0.0.1:6379/14")
+    with override_settings(REDIS_URL=url, RESULT_CACHE_ENABLED=False):
+        get_redis.cache_clear()
+        get_redis().flushdb()
+        yield
+    get_redis.cache_clear()
 
 
 @pytest.fixture(autouse=True)

@@ -83,7 +83,8 @@ export interface paths {
         put?: never;
         /**
          * @description Upload a document for processing. `201` when new; `200` with the existing document if
-         *     the same file was uploaded before. `413` if too large, `415` if not a supported type.
+         *     the same file was uploaded before. `413` if too large, `415` if not a supported type, `429`
+         *     (with Retry-After) past the tenant's upload rate.
          */
         post: operations["v1_documents_create"];
         delete?: never;
