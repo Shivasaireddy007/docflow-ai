@@ -1,0 +1,192 @@
+"""Evaluate the pipeline on CORD's labelled receipts.
+
+    uv run python -m evaluation.run --limit 100          # writes docs/evaluation/
+
+Runs the production code path (pages -> OCR -> extraction -> confidence -> default rules) with
+the result cache, compares every field with the labels, and writes results.json and README.md.
+A second pass over the same receipts measures the cache.
+"""
+
+import argparse
+import json
+import os
+import platform
+import time
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Any
+
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+django.setup()
+
+import httpx  # noqa: E402
+from django.conf import settings  # noqa: E402
+from django.utils import timezone  # noqa: E402
+
+from evaluation import metrics, report, truth  # noqa: E402
+from pipeline import confidence, files, schema  # noqa: E402
+from pipeline.cache import get_result_cache, sha256  # noqa: E402
+from pipeline.providers import default_providers, extraction_version, ocr_version, pipeline_version  # noqa: E402
+from review import rules  # noqa: E402
+
+ROWS_URL = "https://datasets-server.huggingface.co/rows"
+DATASET = "naver-clova-ix/cord-v2"
+TENANT = "evaluation"
+THRESHOLDS = [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0]
+
+
+def download(directory: Path, split: str, limit: int) -> list[tuple[str, Path, dict[str, Any]]]:
+    """CORD receipts and labels, fetched once and kept in `directory`."""
+    directory.mkdir(parents=True, exist_ok=True)
+    samples = []
+    with httpx.Client(timeout=60, follow_redirects=True) as http:
+        for offset in range(0, limit, 100):
+            page = http.get(
+                ROWS_URL,
+                params={
+                    "dataset": DATASET,
+                    "config": "default",
+                    "split": split,
+                    "offset": offset,
+                    "length": min(100, limit - offset),
+                },
+            )
+            page.raise_for_status()
+            for row in page.json()["rows"]:
+                name = f"{split}-{row['row_idx']:03d}"
+                image, label = directory / f"{name}.jpg", directory / f"{name}.json"
+                if not image.exists():
+                    image.write_bytes(http.get(row["row"]["image"]["src"]).content)
+                if not label.exists():
+                    label.write_text(
+                        json.dumps(json.loads(row["row"]["ground_truth"])["gt_parse"], ensure_ascii=False)
+                    )
+                samples.append((name, image, json.loads(label.read_text())))
+    return samples
+
+
+def evaluate_one(name: str, image: Path, gt: dict[str, Any]) -> dict[str, Any]:
+    ocr, extract = default_providers()
+    cache = get_result_cache()
+    data = image.read_bytes()
+    pages = files.to_pages(data, files.sniff(data) or files.JPEG, settings.MAX_PAGES)
+
+    started = time.perf_counter()
+    read = cache.get_or_compute(cache.key("ocr", TENANT, ocr_version(), sha256(*pages)), lambda: ocr(pages))
+    ocr_ms = (time.perf_counter() - started) * 1000
+    started = time.perf_counter()
+    text: str = read.value
+    extracted = cache.get_or_compute(
+        cache.key("extraction", TENANT, extraction_version(), sha256(text.encode())), lambda: extract(text)
+    )
+    extraction_ms = (time.perf_counter() - started) * 1000
+
+    receipt = schema.coerce(extracted.value)
+    fields, _, document_confidence = confidence.score(receipt, text)
+    context = rules.Context(document_confidence, find_duplicate=lambda _f: None, today=timezone.localdate())
+    results = rules.evaluate(rules.DEFAULT_RULES, fields, context)
+    # The threshold sweep varies only the confidence rule; record whether everything else passed.
+    others_pass = all(r.passed for r in results if r.type != "min_confidence")
+    item_amounts = [amount for i in receipt.line_items if isinstance(amount := i.get("amount"), float)]
+
+    return {
+        "name": name,
+        **metrics.row_for(truth.parse(gt), receipt.fields, item_amounts),
+        "confidence": document_confidence,
+        "auto_approved": all(r.passed for r in results),
+        "other_rules_pass": others_pass,
+        "failed_rules": [r.rule_id for r in results if not r.passed],
+        "ocr_ms": round(ocr_ms),
+        "extraction_ms": round(extraction_ms),
+        "cached": {"ocr": read.hit, "extraction": extracted.hit},
+    }
+
+
+def threshold_sweep(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    sweep = []
+    for threshold in THRESHOLDS:
+        for row in rows:
+            row["_approved"] = row["other_rules_pass"] and row["confidence"] >= threshold
+        sweep.append({"threshold": threshold, **metrics.decision_summary(rows, "_approved")})
+    for row in rows:
+        row.pop("_approved", None)
+    return sweep
+
+
+def summarise(rows: list[dict[str, Any]], warm: list[dict[str, Any]]) -> dict[str, Any]:
+    matched = sum(r["items"][0] for r in rows)
+    predicted = sum(r["items"][1] for r in rows)
+    labelled = sum(r["items"][2] for r in rows)
+    cold = [r["ocr_ms"] + r["extraction_ms"] for r in rows if not any(r["cached"].values())]
+    warm_ms = [r["ocr_ms"] + r["extraction_ms"] for r in warm]
+    return {
+        "fields": metrics.as_dict(metrics.score_fields(rows)),
+        "line_items": {
+            "matched": matched,
+            "precision": matched / predicted if predicted else None,
+            "recall": matched / labelled if labelled else None,
+        },
+        "decisions": metrics.decision_summary(rows),
+        "threshold_sweep": threshold_sweep(rows),
+        "latency_ms": {
+            "ocr_p50": metrics.percentile([r["ocr_ms"] for r in rows], 50),
+            "ocr_p95": metrics.percentile([r["ocr_ms"] for r in rows], 95),
+            "extraction_p50": metrics.percentile([r["extraction_ms"] for r in rows], 50),
+            "extraction_p95": metrics.percentile([r["extraction_ms"] for r in rows], 95),
+            "document_p50": metrics.percentile(cold, 50),
+            "document_p95": metrics.percentile(cold, 95),
+            "cached_document_p50": metrics.percentile(warm_ms, 50),
+            "cached_document_p95": metrics.percentile(warm_ms, 95),
+        },
+        "model_ms_per_document": round(sum(cold) / len(cold)) if cold else None,
+    }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument("--split", default="test")
+    parser.add_argument("--limit", type=int, default=100)
+    parser.add_argument(
+        "--data", type=Path, default=Path(__file__).resolve().parents[2] / "data" / "cord-eval"
+    )
+    parser.add_argument(
+        "--out", type=Path, default=Path(__file__).resolve().parents[2] / "docs" / "evaluation"
+    )
+    args = parser.parse_args()
+
+    samples = download(args.data, args.split, args.limit)
+    print(f"Evaluating {len(samples)} receipts with {pipeline_version()}")
+    rows = []
+    for i, (name, image, gt) in enumerate(samples, start=1):
+        row = evaluate_one(name, image, gt)
+        rows.append(row)
+        print(f"{i:3}/{len(samples)} {name} total={'ok' if row['total_correct'] else 'MISS':4} "
+              f"conf={row['confidence']:.2f} {'auto' if row['auto_approved'] else 'review':6} "
+              f"{row['ocr_ms'] / 1000:.1f}s+{row['extraction_ms'] / 1000:.1f}s", flush=True)  # fmt: skip
+
+    print("Second pass (warm cache)")
+    warm = [evaluate_one(name, image, gt) for name, image, gt in samples]
+
+    result = {
+        "run": {
+            "date": datetime.now(UTC).isoformat(timespec="seconds"),
+            "dataset": f"{DATASET} ({args.split}, {len(samples)} receipts)",
+            "pipeline_version": pipeline_version(),
+            "rules": rules.DEFAULT_RULES,
+            "machine": f"{platform.machine()} {platform.system()} {platform.release()}",
+        },
+        "summary": summarise(rows, warm),
+        "documents": rows,
+    }
+    args.out.mkdir(parents=True, exist_ok=True)
+    (args.out / "results.json").write_text(json.dumps(result, indent=1))
+    (args.out / "README.md").write_text(report.render(result))
+    print(f"Wrote {args.out / 'README.md'}")
+
+
+if __name__ == "__main__":
+    main()
