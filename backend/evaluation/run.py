@@ -191,6 +191,11 @@ def summarise(rows: list[dict[str, Any]], warm: list[dict[str, Any]]) -> dict[st
     }
 
 
+def _model_times(row: dict[str, Any]) -> dict[str, Any]:
+    """The model times and cache hits of the run that called the models."""
+    return {key: row[key] for key in ("ocr_ms", "extraction_ms", "cached") if key in row}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -202,6 +207,12 @@ def main() -> None:
     parser.add_argument("--data", type=Path, help="Where receipts are kept (default data/<dataset>-eval)")
     parser.add_argument("--out", type=Path, default=root / "docs" / "evaluation")
     parser.add_argument("--fresh", action="store_true", help="Ignore saved progress and start over")
+    parser.add_argument(
+        "--rescore",
+        action="store_true",
+        help="Score saved receipts again with the current checks and rules; model output comes from the "
+        "cache and the model times measured when it ran are kept",
+    )
     args = parser.parse_args()
     dataset = truth.DATASETS[args.dataset]
     args.data = args.data or root / "data" / f"{dataset.name}-eval"
@@ -220,6 +231,10 @@ def main() -> None:
         print(f"Resuming: {len(done)} receipts already evaluated")
     rows = []
     for i, (name, image, gt) in enumerate(samples, start=1):
+        if name in done and args.rescore:
+            row = {**with_retries(dataset, name, image, gt), **_model_times(done[name])}
+            rows.append(row)
+            continue
         if name in done:
             rows.append(done[name])
             continue
@@ -231,6 +246,9 @@ def main() -> None:
               f"conf={row['confidence']:.2f} {'auto' if row['auto_approved'] else 'review':6} "
               f"{row['ocr_ms'] / 1000:.1f}s+{row['extraction_ms'] / 1000:.1f}s", flush=True)  # fmt: skip
 
+    if args.rescore:
+        progress.write_text("".join(json.dumps(row) + "\n" for row in rows))
+
     print("Second pass (warm cache)")
     warm = [with_retries(dataset, name, image, gt) for name, image, gt in samples]
 
@@ -241,6 +259,7 @@ def main() -> None:
             "pipeline_version": pipeline_version(),
             "rules": rules.DEFAULT_RULES,
             "machine": f"{platform.machine()} {platform.system()} {platform.release()}",
+            "rescored": args.rescore,
         },
         "summary": summarise(rows, warm),
         "documents": rows,
