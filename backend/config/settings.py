@@ -152,7 +152,7 @@ OCR_MODEL = env("OCR_MODEL", "qwen2.5vl:3b")
 EXTRACTION_MODEL = env("EXTRACTION_MODEL", "qwen2.5:7b")
 MODEL_TIMEOUT_SECONDS = float(env("MODEL_TIMEOUT_SECONDS", "180"))
 # Bump when prompts or the schema change, so cached and stored results are tied to what produced them.
-PROMPT_VERSION = env("PROMPT_VERSION", "2")
+PROMPT_VERSION = env("PROMPT_VERSION", "3")
 OCR_PROMPT_VERSION = env("OCR_PROMPT_VERSION", "1")
 
 # Redis: the model-result cache and rate limits. Both keep working (uncached, unlimited) if it's down.

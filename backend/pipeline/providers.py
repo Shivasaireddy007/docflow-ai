@@ -26,7 +26,9 @@ OCR_PROMPT = (
 EXTRACTION_PROMPT = """You extract fields from receipt text produced by OCR.
 Return JSON matching the schema. Rules:
 - Use null for anything not on the receipt. Never guess or calculate a value that isn't printed.
-- Amounts are plain numbers without currency symbols or thousands separators (12.500 or 12,500 -> 12500).
+- Amounts are plain numbers without currency symbols or thousands separators. A separator followed
+  by exactly three digits groups thousands (12.500 or 12,500 -> 12500); followed by one or two
+  digits it is the decimal point (38.90 -> 38.9, 6,35 -> 6.35). Keep the decimals.
 - total is the final amount payable, printed as TOTAL, GRAND TOTAL, AMOUNT DUE, DUE, TOTAL BAYAR or
   JUMLAH. It is never the CASH amount handed over, the CHANGE returned, or the SUBTOTAL.
 - cash_paid is the CASH (TUNAI) amount handed over; change is the CHANGE (KEMBALI) returned.
