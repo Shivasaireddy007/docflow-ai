@@ -13,6 +13,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
+from core.metrics import DOCUMENTS
 from documents.models import Document, Job
 from pipeline import run
 from pipeline.files import UnsupportedFile
@@ -101,6 +102,7 @@ def execute(job: Job) -> None:
 
 
 def _fail(job: Job, document: Document, error: str) -> None:
+    DOCUMENTS.labels("failed").inc()
     Job.objects.filter(pk=job.pk).update(
         status=Job.Status.FAILED, finished_at=timezone.now(), last_error=error
     )

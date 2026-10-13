@@ -22,6 +22,7 @@ dependencies = [
     "opentelemetry-instrumentation-redis>=0.66b1",
     "opentelemetry-sdk>=1.45.1",
     "pillow>=12.3.0",
+    "prometheus-client>=0.26.0",
     "psycopg[binary]>=3.3.6",
     "pypdfium2>=5.14.0",
     "redis>=8.1.0",

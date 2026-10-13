@@ -20,6 +20,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core import signing
+from core.metrics import DOCUMENTS
 from documents.models import Document, Extraction
 from review import audit
 from review.decisions import decide_automatically
@@ -60,6 +61,7 @@ class PipelineResultView(APIView):
                 Document.objects.filter(pk=document.pk).update(
                     status=Document.Status.FAILED, error=report["error"]
                 )
+                DOCUMENTS.labels("failed").inc()
                 audit.record(document.tenant, ACTOR, "failed", document, error=report["error"])
                 return Response({"status": "failed"})
 

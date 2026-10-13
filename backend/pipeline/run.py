@@ -10,6 +10,7 @@ from collections.abc import Callable
 from django.conf import settings
 from opentelemetry import trace
 
+from core.metrics import MODEL_CACHE, STEP_SECONDS
 from documents.models import Document, Extraction
 from documents.storage import get_storage
 from pipeline import confidence, files, schema
@@ -51,6 +52,8 @@ def process(document: Document) -> Extraction:
         span.set_attributes({"docflow.model": settings.OCR_MODEL, "docflow.cache_hit": read.hit})
     text: str = read.value
     ocr_ms = _ms(started)
+    STEP_SECONDS.labels("ocr").observe(ocr_ms / 1000)
+    MODEL_CACHE.labels("ocr", "hit" if read.hit else "miss").inc()
 
     started = time.perf_counter()
     with tracer.start_as_current_span("pipeline.extract") as span:
@@ -59,6 +62,8 @@ def process(document: Document) -> Extraction:
         span.set_attributes({"docflow.model": settings.EXTRACTION_MODEL, "docflow.cache_hit": extracted.hit})
     receipt = schema.coerce(extracted.value)
     extraction_ms = _ms(started)
+    STEP_SECONDS.labels("extract").observe(extraction_ms / 1000)
+    MODEL_CACHE.labels("extraction", "hit" if extracted.hit else "miss").inc()
 
     with tracer.start_as_current_span("pipeline.score") as span:
         fields, items, document_confidence = confidence.score(receipt, text)

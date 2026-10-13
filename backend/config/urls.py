@@ -4,6 +4,8 @@ from django.http import HttpRequest, JsonResponse
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
+from core.metrics import metrics_view
+
 
 def health(request: HttpRequest) -> JsonResponse:
     """Liveness: the process is up."""
@@ -23,6 +25,7 @@ def ready(request: HttpRequest) -> JsonResponse:
 urlpatterns = [
     path("health", health),
     path("ready", ready),
+    path("metrics", metrics_view),
     path("admin/", admin.site.urls),
     path("api/v1/", include("documents.urls")),
     path("api/v1/", include("review.urls")),

@@ -8,6 +8,7 @@ from django.db import connection, transaction
 from django.db.models import Q
 from django.utils import timezone
 
+from core.metrics import DOCUMENTS, REVIEWS
 from documents.models import Document, Extraction
 from pipeline import schema
 from review import audit
@@ -78,6 +79,7 @@ def decide_automatically(document: Document, extraction: Extraction) -> Decision
             claimed_by=None,
             claim_expires_at=None,
         )
+        DOCUMENTS.labels(decision.outcome).inc()
         audit.record(
             document.tenant,
             audit.PIPELINE,
@@ -175,6 +177,7 @@ def decide_by_reviewer(
         document.claimed_by = None
         document.claim_expires_at = None
         document.save(update_fields=["status", "claimed_by", "claim_expires_at", "updated_at"])
+        REVIEWS.labels("approved" if approve else "rejected", "yes" if changes else "no").inc()
         audit.record(
             tenant,
             audit.actor_of(user),

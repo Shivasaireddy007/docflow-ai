@@ -20,5 +20,6 @@ USER 10001
 EXPOSE 8000
 HEALTHCHECK --interval=10s --timeout=3s --retries=5 \
   CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"
-# The same image runs the worker: `python manage.py run_worker`.
-CMD ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8000", "--workers", "3", "--access-logfile", "-"]
+# The same image runs the worker: `python manage.py run_worker` (metrics on WORKER_METRICS_PORT).
+ENV PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus
+CMD ["gunicorn", "config.wsgi", "-c", "gunicorn.conf.py"]

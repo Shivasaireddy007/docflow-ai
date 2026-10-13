@@ -1,4 +1,5 @@
 import logging
+import os
 import signal
 import time
 from types import FrameType
@@ -6,6 +7,7 @@ from typing import Any
 
 from django.core.management.base import BaseCommand, CommandParser
 from django.db import close_old_connections
+from prometheus_client import start_http_server
 
 from core import telemetry
 from documents import jobs
@@ -22,6 +24,8 @@ class Command(BaseCommand):
 
     def handle(self, *args: Any, **options: Any) -> None:
         telemetry.install("docflow-worker")
+        if port := os.environ.get("WORKER_METRICS_PORT"):
+            start_http_server(int(port))  # Prometheus scrapes the worker here
         if options["once"]:
             jobs.run_once()
             return
