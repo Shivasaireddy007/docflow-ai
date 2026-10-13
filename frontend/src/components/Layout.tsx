@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 
 import { useLogout, useMe, useQueue } from '../hooks/queries'
+import { IS_DEMO, REPO_URL } from '../lib/demo'
 import { Logo } from './Logo'
 
 export function Layout() {
@@ -14,6 +15,15 @@ export function Layout() {
 
   return (
     <div className="min-h-screen">
+      {IS_DEMO ? (
+        <p className="bg-ink px-4 py-2 text-center text-sm text-white">
+          Public demo: these receipts were read by self-hosted models ahead of time, and uploads are off.
+          Approve, correct or reject them as a reviewer would.{' '}
+          <a href={REPO_URL} className="font-semibold underline">
+            How it's built
+          </a>
+        </p>
+      ) : null}
       <header className="sticky top-0 z-10 border-b border-line bg-surface">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2.5">
           <Logo />

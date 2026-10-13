@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import type { DocumentStatus } from '../api/types'
 import { StatusBadge } from '../components/Badges'
 import { useDocuments, useUpload } from '../hooks/queries'
+import { IS_DEMO } from '../lib/demo'
 import { STATUS_LABELS, timeAgo } from '../lib/format'
 
 const FILTERS: (DocumentStatus | undefined)[] = [undefined, 'needs_review', 'approved', 'rejected', 'queued', 'failed']
@@ -29,34 +30,38 @@ export function DocumentsPage() {
         <h1 id="documents-title" className="text-xl font-bold">
           Documents
         </h1>
+        {IS_DEMO ? (
+          <p className="text-sm text-muted">Uploads are off in this demo.</p>
+        ) : (
         <div className="flex items-center gap-3">
-          {uploaded ? <span className="text-sm text-good">{uploaded}</span> : null}
-          {upload.isError ? <span className="text-sm text-crit">{upload.error.message}</span> : null}
-          <input
-            ref={input}
-            type="file"
-            accept="application/pdf,image/png,image/jpeg,image/webp"
-            className="hidden"
-            aria-label="Choose a document to upload"
-            onChange={(e) => {
-              const file = e.target.files?.[0]
-              if (!file) return
-              setUploaded(null)
-              upload.mutate(file, {
-                onSuccess: (doc) => setUploaded(doc?.duplicate ? `${file.name} was already uploaded` : `Uploaded ${file.name}`),
-              })
-              e.target.value = ''
-            }}
-          />
-          <button
-            type="button"
-            onClick={() => input.current?.click()}
-            disabled={upload.isPending}
-            className="rounded-lg bg-brand px-4 py-2 font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
-          >
-            {upload.isPending ? 'Uploading…' : 'Upload document'}
-          </button>
-        </div>
+            {uploaded ? <span className="text-sm text-good">{uploaded}</span> : null}
+            {upload.isError ? <span className="text-sm text-crit">{upload.error.message}</span> : null}
+            <input
+              ref={input}
+              type="file"
+              accept="application/pdf,image/png,image/jpeg,image/webp"
+              className="hidden"
+              aria-label="Choose a document to upload"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (!file) return
+                setUploaded(null)
+                upload.mutate(file, {
+                  onSuccess: (doc) => setUploaded(doc?.duplicate ? `${file.name} was already uploaded` : `Uploaded ${file.name}`),
+                })
+                e.target.value = ''
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => input.current?.click()}
+              disabled={upload.isPending}
+              className="rounded-lg bg-brand px-4 py-2 font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
+            >
+              {upload.isPending ? 'Uploading…' : 'Upload document'}
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-wrap gap-1" role="tablist" aria-label="Filter by status">

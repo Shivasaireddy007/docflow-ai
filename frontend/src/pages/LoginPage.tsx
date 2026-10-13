@@ -3,14 +3,15 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 
 import { Logo } from '../components/Logo'
 import { useLogin, useMe } from '../hooks/queries'
+import { DEMO_LOGIN, IS_DEMO } from '../lib/demo'
 
 export function LoginPage() {
   const { data: me } = useMe()
   const login = useLogin()
   const navigate = useNavigate()
   const location = useLocation()
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [username, setUsername] = useState(IS_DEMO ? DEMO_LOGIN.username : '')
+  const [password, setPassword] = useState(IS_DEMO ? DEMO_LOGIN.password : '')
   const from = (location.state as { from?: string } | null)?.from ?? '/'
 
   if (me) return <Navigate to={from} replace />
@@ -26,6 +27,11 @@ export function LoginPage() {
       >
         <Logo />
         <h1 className="text-lg font-bold">Sign in to review documents</h1>
+        {IS_DEMO ? (
+          <p className="rounded-md bg-brand-soft p-3 text-sm text-brand-dark">
+            Public demo. The sign-in is filled in for you: press <strong>Sign in</strong>.
+          </p>
+        ) : null}
         <label className="grid gap-1 text-sm">
           <span className="font-semibold">Username</span>
           <input value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" required className="rounded-md border border-line px-3 py-2" />
