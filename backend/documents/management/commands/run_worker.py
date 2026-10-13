@@ -7,6 +7,7 @@ from typing import Any
 from django.core.management.base import BaseCommand, CommandParser
 from django.db import close_old_connections
 
+from core import telemetry
 from documents import jobs
 
 log = logging.getLogger(__name__)
@@ -20,6 +21,7 @@ class Command(BaseCommand):
         parser.add_argument("--idle-seconds", type=float, default=1.0)
 
     def handle(self, *args: Any, **options: Any) -> None:
+        telemetry.install("docflow-worker")
         if options["once"]:
             jobs.run_once()
             return
