@@ -27,6 +27,11 @@ EXTRACTION_PROMPT = """You extract fields from receipt text produced by OCR.
 Return JSON matching the schema. Rules:
 - Use null for anything not on the receipt. Never guess or calculate a value that isn't printed.
 - Amounts are plain numbers without currency symbols or thousands separators (12.500 or 12,500 -> 12500).
+- total is the final amount payable, printed as TOTAL, GRAND TOTAL, AMOUNT DUE, DUE, TOTAL BAYAR or
+  JUMLAH. It is never the CASH amount handed over, the CHANGE returned, or the SUBTOTAL.
+- cash_paid is the CASH (TUNAI) amount handed over; change is the CHANGE (KEMBALI) returned.
+- OCR sometimes lists the labels (SUBTOTAL, TAX, TOTAL, CASH, CHANGE) and then a column of amounts:
+  pair them in the same order.
 - receipt_date is YYYY-MM-DD. currency is the 3-letter ISO code, only if a currency code or symbol is printed.
 - line_items are the purchased items in order; amount is the printed line total.
 

@@ -16,6 +16,8 @@ FIELD_MAP = [
     ("tax", "sub_total", "tax_price"),
     ("service_charge", "sub_total", "service_price"),
     ("discount", "sub_total", "discount_price"),
+    ("cash_paid", "total", "cashprice"),
+    ("change", "total", "changeprice"),
 ]
 EVALUATED_FIELDS = [name for name, _, _ in FIELD_MAP]
 

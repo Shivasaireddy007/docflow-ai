@@ -174,6 +174,13 @@ def consistency(receipt: Receipt) -> dict[str, bool | None]:
                 result[name] = ok
         if result["subtotal"] is None and isinstance(subtotal, float):
             result["subtotal"] = ok
+
+    # Cash handed over minus change returned is what was paid: catches a CASH amount read as the total.
+    cash, change = f.get("cash_paid"), f.get("change")
+    if isinstance(total, float) and isinstance(cash, float) and isinstance(change, float):
+        paid = _close(cash - change, total)
+        result["total"] = paid if result["total"] is None else (result["total"] and paid)
+        result["cash_paid"] = result["change"] = paid
     return result
 
 

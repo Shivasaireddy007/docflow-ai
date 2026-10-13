@@ -33,6 +33,14 @@ def test_a_misread_subtotal_is_flagged_by_the_arithmetic() -> None:
     assert checks["total"] is False
 
 
+def test_cash_minus_change_must_equal_the_total() -> None:
+    assert consistency(receipt(cash_paid=60000, change=3900))["total"] is True
+    misread = consistency(
+        receipt(total=60000, subtotal=None, tax=None, line_items=[], cash_paid=60000, change=3900)
+    )
+    assert (misread["total"], misread["cash_paid"]) == (False, False), "the CASH amount read as the total"
+
+
 def test_without_a_total_nothing_is_auto_approvable() -> None:
     _, _, overall = score(receipt(total=None), RECEIPT_TEXT)
 

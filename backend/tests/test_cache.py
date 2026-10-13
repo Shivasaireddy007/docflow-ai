@@ -46,12 +46,12 @@ def test_a_new_prompt_reruns_extraction_but_reuses_the_ocr(api: APIClient, model
     jobs.run_once()
     models(result={"total": 56100})  # what the new prompt returns
 
-    with override_settings(PROMPT_VERSION="2"):
+    with override_settings(PROMPT_VERSION="next"):
         again = process_again(document_id)
 
     assert (again.ocr_cached, again.extraction_cached) == (True, False)
     assert again.fields["total"]["value"] == 56100
-    assert "prompt=2" in again.pipeline_version
+    assert "prompt=next" in again.pipeline_version
 
 
 @pytest.mark.usefixtures("cache_on")

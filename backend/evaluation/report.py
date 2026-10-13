@@ -8,6 +8,8 @@ LABELS = {
     "tax": "Tax",
     "service_charge": "Service charge",
     "discount": "Discount",
+    "cash_paid": "Cash paid",
+    "change": "Change",
 }
 
 
@@ -19,7 +21,11 @@ def pct(value: float | None) -> str:
 
 
 def seconds(ms: float | None) -> str:
-    return MISSING if ms is None else (f"{ms / 1000:.1f} s" if ms >= 100 else f"{ms:.0f} ms")
+    if ms is None:
+        return MISSING
+    if ms < 1:
+        return "under 1 ms"
+    return f"{ms / 1000:.1f} s" if ms >= 100 else f"{ms:.0f} ms"
 
 
 def render(result: dict[str, Any]) -> str:

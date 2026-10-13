@@ -9,11 +9,13 @@ export const FIELD_LABELS: Record<string, string> = {
   service_charge: 'Service charge',
   discount: 'Discount',
   total: 'Total',
+  cash_paid: 'Cash paid',
+  change: 'Change',
 }
 
 export const FIELD_ORDER = Object.keys(FIELD_LABELS)
 
-export const AMOUNT_FIELDS = new Set(['subtotal', 'tax', 'service_charge', 'discount', 'total'])
+export const AMOUNT_FIELDS = new Set(['subtotal', 'tax', 'service_charge', 'discount', 'total', 'cash_paid', 'change'])
 
 const number = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 })
 

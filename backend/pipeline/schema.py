@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any
 
-AMOUNT_FIELDS = ["subtotal", "tax", "service_charge", "discount", "total"]
+AMOUNT_FIELDS = ["subtotal", "tax", "service_charge", "discount", "total", "cash_paid", "change"]
 TEXT_FIELDS = ["merchant_name", "currency"]
 DATE_FIELDS = ["receipt_date"]
 SCALAR_FIELDS = TEXT_FIELDS + DATE_FIELDS + AMOUNT_FIELDS

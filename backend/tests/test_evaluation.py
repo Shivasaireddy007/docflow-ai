@@ -19,6 +19,8 @@ def test_cord_labels_become_our_fields() -> None:
         "tax": None,
         "service_charge": None,
         "discount": 19400,
+        "cash_paid": 200000,
+        "change": None,
     }
     assert parsed.item_amounts == [82000, 61000]
 
