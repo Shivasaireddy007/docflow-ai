@@ -72,3 +72,19 @@ def to_pages(data: bytes, content_type: str, max_pages: int) -> list[bytes]:
         return [_png(pdf[i].render(scale=PDF_RENDER_SCALE).to_pil()) for i in range(min(len(pdf), max_pages))]
     finally:
         pdf.close()
+
+
+def render_page(data: bytes, content_type: str, index: int) -> bytes:
+    """One page as a PNG (for the reviewer's view); IndexError if there is no such page."""
+    if content_type != PDF:
+        if index != 0:
+            raise IndexError(index)
+        with Image.open(io.BytesIO(data)) as image:
+            return _png(image)
+    pdf = pdfium.PdfDocument(data)
+    try:
+        if not 0 <= index < len(pdf):
+            raise IndexError(index)
+        return _png(pdf[index].render(scale=PDF_RENDER_SCALE).to_pil())
+    finally:
+        pdf.close()

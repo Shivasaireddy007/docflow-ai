@@ -7,6 +7,80 @@ info:
 
     **Authentication:** send your tenant's API key as `Authorization: Api-Key <key>`.
 paths:
+  /api/v1/auth/csrf:
+    get:
+      operationId: v1_auth_csrf_retrieve
+      description: Sets the CSRF cookie the web app sends back as X-CSRFToken.
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/login:
+    post:
+      operationId: v1_auth_login_create
+      description: Sign in a reviewer; starts a session (cookie).
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      security:
+      - ApiKey: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/auth/logout:
+    post:
+      operationId: v1_auth_logout_create
+      tags:
+      - v1
+      security:
+      - ApiKey: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/me:
+    get:
+      operationId: v1_auth_me_retrieve
+      description: The signed-in reviewer.
+      tags:
+      - v1
+      security:
+      - ApiKey: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+          description: ''
   /api/v1/documents:
     get:
       operationId: v1_documents_list
@@ -23,14 +97,17 @@ paths:
         schema:
           type: string
           enum:
-          - extracted
+          - approved
           - failed
+          - needs_review
           - processing
           - queued
+          - rejected
       tags:
       - v1
       security:
       - ApiKey: []
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -53,6 +130,7 @@ paths:
         required: true
       security:
       - ApiKey: []
+      - cookieAuth: []
       responses:
         '201':
           content:
@@ -83,6 +161,7 @@ paths:
       - v1
       security:
       - ApiKey: []
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -90,12 +169,44 @@ paths:
               schema:
                 $ref: '#/components/schemas/DocumentDetail'
           description: ''
+  /api/v1/documents/{id}/pages/{number}:
+    get:
+      operationId: v1_documents_pages_retrieve
+      description: Page `number` (from 1) as a PNG, for showing the document beside
+        its fields.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this document.
+        required: true
+      - in: path
+        name: number
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - v1
+      security:
+      - ApiKey: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+          description: ''
   /api/v1/documents/{id}/reprocess:
     post:
       operationId: v1_documents_reprocess_create
       description: |-
         Run the document through the current pipeline again, e.g. after a model upgrade.
-        `409` while it is already queued or processing.
+        `409` while queued or processing, and once a decision is final (approved or rejected).
       parameters:
       - in: path
         name: id
@@ -108,6 +219,7 @@ paths:
       - v1
       security:
       - ApiKey: []
+      - cookieAuth: []
       responses:
         '202':
           content:
@@ -122,8 +234,217 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
+  /api/v1/review/documents/{document_id}:
+    get:
+      operationId: v1_review_documents_retrieve
+      description: 'Everything a reviewer needs: the extraction, every decision so
+        far, and the audit trail.'
+      parameters:
+      - in: path
+        name: document_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      security:
+      - ApiKey: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/review/documents/{document_id}/decision:
+    post:
+      operationId: v1_review_documents_decision_create
+      description: |-
+        Approve or reject a document, with corrected values. `409` if someone else decided it first
+        or is reviewing it.
+      parameters:
+      - in: path
+        name: document_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewDecisionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReviewDecisionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReviewDecisionRequest'
+        required: true
+      security:
+      - ApiKey: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Decision'
+          description: ''
+        '409':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/review/next:
+    post:
+      operationId: v1_review_next_create
+      description: Claim the next document to review (or keep your current one). `204`
+        when the queue is empty.
+      tags:
+      - v1
+      security:
+      - ApiKey: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+        '204':
+          description: No response body
+  /api/v1/review/queue:
+    get:
+      operationId: v1_review_queue_list
+      description: Documents waiting for review, oldest first, with why each needs
+        a person.
+      tags:
+      - v1
+      security:
+      - ApiKey: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QueueItem'
+          description: ''
+  /api/v1/review/stats:
+    get:
+      operationId: v1_review_stats_retrieve
+      description: Queue size, documents by status, and how many decisions the rules
+        made on their own (7 days).
+      tags:
+      - v1
+      security:
+      - ApiKey: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/rules:
+    get:
+      operationId: v1_rules_retrieve
+      description: The active rules, every earlier version, and the rule types available.
+      tags:
+      - v1
+      security:
+      - ApiKey: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    post:
+      operationId: v1_rules_create
+      description: Publish a new version of the rules (admins). Takes effect for the
+        next decision.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublishRulesRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PublishRulesRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PublishRulesRequest'
+        required: true
+      security:
+      - ApiKey: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleSet'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
 components:
   schemas:
+    Decision:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        outcome:
+          $ref: '#/components/schemas/OutcomeEnum'
+        decided_by:
+          type: string
+          readOnly: true
+        rules_version:
+          type: integer
+        rule_results: {}
+        final_fields:
+          description: The values the decision stands on
+        final_line_items: {}
+        corrections:
+          description: '{"total": {"from": 194000, "to": 174600}}'
+        reason:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - decided_by
+      - id
+      - outcome
+      - rules_version
     Document:
       type: object
       properties:
@@ -215,9 +536,16 @@ components:
           type: object
           additionalProperties: {}
           readOnly: true
+        decision:
+          type: object
+          additionalProperties: {}
+          description: 'The latest decision: its outcome, the values it stands on,
+            and who made it.'
+          readOnly: true
       required:
       - content_type
       - created_at
+      - decision
       - error
       - extraction
       - filename
@@ -227,6 +555,44 @@ components:
       - size_bytes
       - status
       - updated_at
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+      required:
+      - password
+      - username
+    Me:
+      type: object
+      properties:
+        username:
+          type: string
+        role:
+          type: string
+        tenant:
+          type: object
+          additionalProperties: {}
+      required:
+      - role
+      - tenant
+      - username
+    OutcomeEnum:
+      enum:
+      - auto_approved
+      - needs_review
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `auto_approved` - Auto Approved
+        * `needs_review` - Needs Review
+        * `approved` - Approved
+        * `rejected` - Rejected
     PaginatedDocumentList:
       type: object
       required:
@@ -250,17 +616,112 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Document'
+    PublishRulesRequest:
+      type: object
+      properties:
+        rules: {}
+        note:
+          type: string
+          default: ''
+          maxLength: 200
+      required:
+      - rules
+    QueueItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        filename:
+          type: string
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        page_count:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        confidence:
+          type: number
+          format: double
+          nullable: true
+        total:
+          type: number
+          format: double
+          nullable: true
+        failed_rules:
+          type: array
+          items:
+            type: string
+        claimed_by:
+          type: string
+          nullable: true
+      required:
+      - claimed_by
+      - confidence
+      - created_at
+      - failed_rules
+      - filename
+      - id
+      - page_count
+      - status
+      - total
+    ReviewDecisionRequest:
+      type: object
+      properties:
+        approve:
+          type: boolean
+        corrections:
+          type: object
+          additionalProperties: {}
+        reason:
+          type: string
+          default: ''
+          maxLength: 1000
+      required:
+      - approve
+    RuleSet:
+      type: object
+      properties:
+        version:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        rules: {}
+        note:
+          type: string
+          maxLength: 200
+        is_active:
+          type: boolean
+        created_by:
+          type: string
+          nullable: true
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - created_by
+      - rules
+      - version
     StatusEnum:
       enum:
       - queued
       - processing
-      - extracted
+      - needs_review
+      - approved
+      - rejected
       - failed
       type: string
       description: |-
         * `queued` - Queued
         * `processing` - Processing
-        * `extracted` - Extracted
+        * `needs_review` - Needs Review
+        * `approved` - Approved
+        * `rejected` - Rejected
         * `failed` - Failed
     UploadRequest:
       type: object
@@ -330,3 +791,7 @@ components:
       in: header
       name: Authorization
       description: '`Api-Key dfk_...`, issued per tenant with `manage.py create_tenant`.'
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

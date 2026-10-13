@@ -1,9 +1,10 @@
 import hashlib
-from typing import Any, cast
+from typing import Any
 
 from django.conf import settings
 from django.db import IntegrityError, transaction
 from django.db.models import QuerySet
+from django.http import HttpResponse
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_field
 from rest_framework import mixins, status, viewsets
@@ -22,10 +23,11 @@ from documents.serializers import (
 )
 from documents.storage import document_key, get_storage
 from pipeline import files
-from tenants.auth import TenantUser
-from tenants.models import Tenant
+from review import audit
+from tenants.access import tenant_of
 
 extend_schema_field(OpenApiTypes.OBJECT)(DocumentDetailSerializer.get_extraction)
+extend_schema_field(OpenApiTypes.OBJECT)(DocumentDetailSerializer.get_decision)
 
 
 class UnsupportedMediaType(ValidationError):
@@ -34,10 +36,6 @@ class UnsupportedMediaType(ValidationError):
 
 class PayloadTooLarge(ValidationError):
     status_code = status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
-
-
-def tenant_of(request: Request) -> Tenant:
-    return cast(TenantUser, request.user).tenant
 
 
 class DocumentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet[Document]):
@@ -110,6 +108,9 @@ class DocumentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
                     storage_key=key,
                 )
                 jobs.enqueue(document)
+                audit.record(
+                    tenant, audit.actor_of(request.user), "uploaded", document, filename=document.filename
+                )
         except IntegrityError:
             # The same file was uploaded at the same moment by another request.
             return self._uploaded(Document.objects.get(tenant=tenant, sha256=sha256), duplicate=True)
@@ -123,13 +124,32 @@ class DocumentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
     @action(detail=True, methods=["post"])
     def reprocess(self, request: Request, pk: str | None = None) -> Response:
         """Run the document through the current pipeline again, e.g. after a model upgrade.
-        `409` while it is already queued or processing."""
+        `409` while queued or processing, and once a decision is final (approved or rejected)."""
         document = self.get_object()
         with transaction.atomic():
-            Document.objects.select_for_update().get(pk=document.pk)
+            locked = Document.objects.select_for_update().get(pk=document.pk)
+            if locked.status in (Document.Status.APPROVED, Document.Status.REJECTED):
+                return Response({"detail": f"Already {locked.status}."}, status=status.HTTP_409_CONFLICT)
             if document.jobs.filter(status__in=[Job.Status.QUEUED, Job.Status.RUNNING]).exists():
                 return Response({"detail": "Already queued or processing."}, status=status.HTTP_409_CONFLICT)
             jobs.enqueue(document)
-            Document.objects.filter(pk=document.pk).update(status=Document.Status.QUEUED, error="")
+            Document.objects.filter(pk=document.pk).update(
+                status=Document.Status.QUEUED, error="", claimed_by=None, claim_expires_at=None
+            )
+            audit.record(document.tenant, audit.actor_of(request.user), "reprocess_requested", document)
         document.refresh_from_db()
         return Response(DocumentSerializer(document).data, status=status.HTTP_202_ACCEPTED)
+
+    @extend_schema(responses={(200, "image/png"): OpenApiTypes.BINARY})
+    @action(detail=True, methods=["get"], url_path=r"pages/(?P<number>\d+)")
+    def page(self, request: Request, pk: str | None = None, number: str = "1") -> HttpResponse:
+        """Page `number` (from 1) as a PNG, for showing the document beside its fields."""
+        document = self.get_object()
+        data = get_storage().get(document.storage_key)
+        try:
+            png = files.render_page(data, document.content_type, int(number) - 1)
+        except IndexError:
+            return HttpResponse(status=404)
+        response = HttpResponse(png, content_type="image/png")
+        response["Cache-Control"] = "private, max-age=3600"  # content-addressed: a page never changes
+        return response

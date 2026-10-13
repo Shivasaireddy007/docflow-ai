@@ -105,7 +105,10 @@ def test_detail_shows_the_latest_extraction(api: APIClient, models: Models) -> N
 
     body: dict[str, Any] = api.get(f"/api/v1/documents/{document_id}").json()
 
-    assert body["status"] == "extracted"
+    assert body["status"] == "approved"
+    assert body["decision"]["outcome"] == "auto_approved"
+    assert (body["decision"]["decided_by"], body["decision"]["rules_version"]) == ("rules", 1)
+    assert body["decision"]["final_fields"]["total"] == 56100
     extraction = body["extraction"]
     assert extraction["fields"]["total"]["value"] == 56100
     assert extraction["fields"]["receipt_date"]["value"] == "2024-03-12"
@@ -119,12 +122,13 @@ def test_list_filters_by_status(api: APIClient, models: Models) -> None:
     upload(api, image_bytes("two"))
 
     queued = api.get("/api/v1/documents?status=queued").json()
-    extracted = api.get("/api/v1/documents?status=extracted").json()
+    approved = api.get("/api/v1/documents?status=approved").json()
 
-    assert (queued["count"], extracted["count"]) == (1, 1)
+    assert (queued["count"], approved["count"]) == (1, 1)
 
 
 def test_reprocess_queues_a_new_run_once(api: APIClient, models: Models) -> None:
+    models(result={"total": 99999})  # ungrounded: goes to review
     document_id = upload(api, image_bytes()).json()["id"]
 
     assert api.post(f"/api/v1/documents/{document_id}/reprocess").status_code == 409, "still queued"
@@ -133,3 +137,22 @@ def test_reprocess_queues_a_new_run_once(api: APIClient, models: Models) -> None
 
     assert (response.status_code, response.json()["status"]) == (202, "queued")
     assert Job.objects.filter(document_id=document_id).count() == 2
+
+
+def test_a_decided_document_cannot_be_reprocessed(api: APIClient, models: Models) -> None:
+    document_id = upload(api, image_bytes()).json()["id"]
+    jobs.run_once()
+
+    response = api.post(f"/api/v1/documents/{document_id}/reprocess")
+
+    assert (response.status_code, response.json()["detail"]) == (409, "Already approved.")
+
+
+def test_pages_are_served_as_images(api: APIClient) -> None:
+    document_id = upload(api, pdf_bytes(pages=2), "invoice.pdf").json()["id"]
+
+    page = api.get(f"/api/v1/documents/{document_id}/pages/2")
+
+    assert (page.status_code, page["Content-Type"]) == (200, "image/png")
+    assert page.content.startswith(b"\x89PNG")
+    assert api.get(f"/api/v1/documents/{document_id}/pages/3").status_code == 404
