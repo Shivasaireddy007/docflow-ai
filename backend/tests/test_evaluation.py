@@ -98,8 +98,9 @@ def test_the_report_renders() -> None:
     assert "about 4.2 hours" in markdown
     assert "Line-item amounts: precision 100%, recall 50%" in markdown
 
-    result["summary"]["line_items"] = {"matched": 0, "precision": 0.0, "recall": None}
-    assert "Line items: not labelled in this dataset." in report.render(result), "SROIE has none"
+    unlabelled = {"matched": 0, "precision": 0.0, "recall": None}
+    sroie = {**result, "summary": {**result["summary"], "line_items": unlabelled}}  # type: ignore[dict-item]
+    assert "Line items: not labelled in this dataset." in report.render(sroie), "SROIE has none"
 
 
 def test_sroie_labels_cover_merchant_date_and_total() -> None:
