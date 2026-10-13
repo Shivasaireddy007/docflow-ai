@@ -5,6 +5,10 @@
 Runs the production code path (pages -> OCR -> extraction -> confidence -> default rules) with
 the result cache, compares every field with the labels, and writes results.json and README.md.
 A second pass over the same receipts measures the cache.
+
+Model errors are retried with backoff, as the worker does. Each receipt's result is appended to
+data/cord-eval/progress-<pipeline>.jsonl as it finishes, so an interrupted run resumes where it
+stopped with its original timings; --fresh starts over.
 """
 
 import argparse
@@ -28,7 +32,14 @@ from django.utils import timezone  # noqa: E402
 from evaluation import metrics, report, truth  # noqa: E402
 from pipeline import confidence, files, schema  # noqa: E402
 from pipeline.cache import get_result_cache, sha256  # noqa: E402
-from pipeline.providers import default_providers, extraction_version, ocr_version, pipeline_version  # noqa: E402
+from pipeline.providers import (  # noqa: E402
+    ModelError,
+    ModelRepetition,
+    default_providers,
+    extraction_version,
+    ocr_version,
+    pipeline_version,
+)
 from review import rules  # noqa: E402
 
 ROWS_URL = "https://datasets-server.huggingface.co/rows"
@@ -104,6 +115,38 @@ def evaluate_one(name: str, image: Path, gt: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def unreadable(name: str, gt: dict[str, Any], error: str) -> dict[str, Any]:
+    """A receipt the models couldn't read even with anti-repetition sampling: nothing extracted,
+    so it would go to a person."""
+    return {
+        "name": name,
+        **metrics.row_for(truth.parse(gt), {}, []),
+        "confidence": 0.0,
+        "auto_approved": False,
+        "other_rules_pass": False,
+        "failed_rules": ["unreadable"],
+        "ocr_ms": 0,
+        "extraction_ms": 0,
+        "cached": {"ocr": False, "extraction": False},
+        "error": error,
+    }
+
+
+def with_retries(name: str, image: Path, gt: dict[str, Any], attempts: int = 4) -> dict[str, Any]:
+    for attempt in range(1, attempts + 1):
+        try:
+            return evaluate_one(name, image, gt)
+        except ModelRepetition as exc:
+            return unreadable(name, gt, str(exc))
+        except ModelError as exc:
+            if attempt == attempts:
+                raise
+            wait = 5 * 2 ** (attempt - 1)
+            print(f"    {name}: {exc}; retrying in {wait}s", flush=True)
+            time.sleep(wait)
+    raise AssertionError("unreachable")
+
+
 def threshold_sweep(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     sweep = []
     for threshold in THRESHOLDS:
@@ -119,7 +162,8 @@ def summarise(rows: list[dict[str, Any]], warm: list[dict[str, Any]]) -> dict[st
     matched = sum(r["items"][0] for r in rows)
     predicted = sum(r["items"][1] for r in rows)
     labelled = sum(r["items"][2] for r in rows)
-    cold = [r["ocr_ms"] + r["extraction_ms"] for r in rows if not any(r["cached"].values())]
+    read = [r for r in rows if "error" not in r]  # unreadable receipts have no model time to measure
+    cold = [r["ocr_ms"] + r["extraction_ms"] for r in read if not any(r["cached"].values())]
     warm_ms = [r["ocr_ms"] + r["extraction_ms"] for r in warm]
     return {
         "fields": metrics.as_dict(metrics.score_fields(rows)),
@@ -131,10 +175,10 @@ def summarise(rows: list[dict[str, Any]], warm: list[dict[str, Any]]) -> dict[st
         "decisions": metrics.decision_summary(rows),
         "threshold_sweep": threshold_sweep(rows),
         "latency_ms": {
-            "ocr_p50": metrics.percentile([r["ocr_ms"] for r in rows], 50),
-            "ocr_p95": metrics.percentile([r["ocr_ms"] for r in rows], 95),
-            "extraction_p50": metrics.percentile([r["extraction_ms"] for r in rows], 50),
-            "extraction_p95": metrics.percentile([r["extraction_ms"] for r in rows], 95),
+            "ocr_p50": metrics.percentile([r["ocr_ms"] for r in read], 50),
+            "ocr_p95": metrics.percentile([r["ocr_ms"] for r in read], 95),
+            "extraction_p50": metrics.percentile([r["extraction_ms"] for r in read], 50),
+            "extraction_p95": metrics.percentile([r["extraction_ms"] for r in read], 95),
             "document_p50": metrics.percentile(cold, 50),
             "document_p95": metrics.percentile(cold, 95),
             "cached_document_p50": metrics.percentile(warm_ms, 50),
@@ -156,20 +200,36 @@ def main() -> None:
     parser.add_argument(
         "--out", type=Path, default=Path(__file__).resolve().parents[2] / "docs" / "evaluation"
     )
+    parser.add_argument("--fresh", action="store_true", help="Ignore saved progress and start over")
     args = parser.parse_args()
 
     samples = download(args.data, args.split, args.limit)
     print(f"Evaluating {len(samples)} receipts with {pipeline_version()}")
+    progress = args.data / f"progress-{sha256(pipeline_version().encode())[:12]}.jsonl"
+    if args.fresh:
+        progress.unlink(missing_ok=True)
+    done = (
+        {row["name"]: row for row in map(json.loads, progress.read_text().splitlines())}
+        if progress.exists()
+        else {}
+    )
+    if done:
+        print(f"Resuming: {len(done)} receipts already evaluated")
     rows = []
     for i, (name, image, gt) in enumerate(samples, start=1):
-        row = evaluate_one(name, image, gt)
+        if name in done:
+            rows.append(done[name])
+            continue
+        row = with_retries(name, image, gt)
+        with progress.open("a") as saved:
+            saved.write(json.dumps(row) + "\n")
         rows.append(row)
         print(f"{i:3}/{len(samples)} {name} total={'ok' if row['total_correct'] else 'MISS':4} "
               f"conf={row['confidence']:.2f} {'auto' if row['auto_approved'] else 'review':6} "
               f"{row['ocr_ms'] / 1000:.1f}s+{row['extraction_ms'] / 1000:.1f}s", flush=True)  # fmt: skip
 
     print("Second pass (warm cache)")
-    warm = [evaluate_one(name, image, gt) for name, image, gt in samples]
+    warm = [with_retries(name, image, gt) for name, image, gt in samples]
 
     result = {
         "run": {
