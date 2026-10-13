@@ -1,8 +1,11 @@
 # The whole pipeline except the models:  docker compose up --build -d
-# Then create a tenant:                   docker compose exec api python manage.py create_tenant "Acme"
+# Then create a tenant and a reviewer:
+#   docker compose exec api python manage.py create_tenant "Acme"
+#   docker compose exec api python manage.py create_reviewer acme asha --admin
 #
-# Ollama runs on the host (`ollama serve`), where it can use the Mac's GPU; Docker on macOS
-# can't. API at http://localhost:8000/api/docs, storage console at http://localhost:9001.
+# Review app at http://localhost:8080, API docs at http://localhost:8000/api/docs, storage
+# console at http://localhost:9001. Ollama runs on the host (`ollama serve`), where it can use
+# the Mac's GPU; Docker on macOS can't.
 
 x-app: &app
   build: ./backend
@@ -75,6 +78,16 @@ services:
   worker:
     <<: *app
     command: ["python", "manage.py", "run_worker"]
+
+  web:
+    build: ./frontend
+    image: docflow-web
+    ports:
+      - "8080:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   postgres:
