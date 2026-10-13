@@ -8,7 +8,7 @@ from rest_framework.test import APIClient
 
 from documents import jobs
 from documents.models import Document, Job
-from pipeline.providers import ModelError
+from pipeline.providers import ModelError, ModelRepetition
 from tenants.models import Tenant
 from tests.conftest import Models, client_for, image_bytes, upload
 
@@ -107,3 +107,17 @@ def test_workers_skip_jobs_another_worker_has_locked(models: Models) -> None:
 
 def queued_document_with(api: APIClient, text: str) -> Document:
     return Document.objects.get(pk=upload(api, image_bytes(text)).json()["id"])
+
+
+def test_a_document_the_model_cannot_read_fails_without_wasting_retries(
+    api: APIClient, models: Models
+) -> None:
+    models(result=ModelRepetition("qwen2.5:7b ran past 1024 tokens"))
+    document = queued_document(api)
+
+    jobs.run_once()
+
+    job = document.jobs.get()
+    document.refresh_from_db()
+    assert (job.status, job.attempts) == (Job.Status.FAILED, 1)
+    assert document.error.startswith("The model couldn't read this document")

@@ -38,6 +38,15 @@ class ModelError(Exception):
     """The model server failed or returned something unusable. Worth retrying."""
 
 
+class ModelRepetition(ModelError):
+    """The model fell into a loop ("0000...") and was cut off. Deterministic: the same input loops
+    again, so the page is retried once with anti-repetition sampling instead of as-is."""
+
+
+# Used only after a repetition loop: penalise repeats and sample a little (still seeded).
+ANTI_REPETITION = {"repeat_penalty": 1.25, "temperature": 0.3}
+
+
 class OcrProvider(Protocol):
     model: str
 
@@ -59,6 +68,7 @@ class ChatClient(Protocol):
         max_tokens: int,
         images: list[bytes] | None = None,
         schema: dict[str, Any] | None = None,
+        sampling: dict[str, float] | None = None,
     ) -> str: ...
 
 
@@ -83,6 +93,7 @@ class OllamaClient:
         max_tokens: int,
         images: list[bytes] | None = None,
         schema: dict[str, Any] | None = None,
+        sampling: dict[str, float] | None = None,
     ) -> str:
         message: dict[str, Any] = {"role": "user", "content": prompt}
         if images:
@@ -93,7 +104,7 @@ class OllamaClient:
             "stream": False,
             # Capped output stops a model that starts repeating itself; keep_alive keeps the OCR
             # and extraction models both loaded instead of swapping them for every document.
-            "options": {"temperature": 0, "seed": 7, "num_predict": max_tokens},
+            "options": {"temperature": 0, "seed": 7, "num_predict": max_tokens, **(sampling or {})},
             "keep_alive": "30m",
         }
         if schema is not None:
@@ -102,10 +113,15 @@ class OllamaClient:
             self._before_call(model)
         try:
             response = self._http.post("/api/chat", json=body)
+            if response.status_code == 500 and "repeat limit" in response.text:
+                raise ModelRepetition(f"{model} repeated itself until it was stopped")
             response.raise_for_status()
-            content = response.json()["message"]["content"]
+            reply = response.json()
+            content = reply["message"]["content"]
         except (httpx.HTTPError, KeyError, ValueError) as exc:
             raise ModelError(f"{model} failed: {exc}") from exc
+        if reply.get("done_reason") == "length":
+            raise ModelRepetition(f"{model} ran past {max_tokens} tokens")
         return str(content)
 
 
@@ -132,6 +148,7 @@ class OpenAIClient:
         max_tokens: int,
         images: list[bytes] | None = None,
         schema: dict[str, Any] | None = None,
+        sampling: dict[str, float] | None = None,
     ) -> str:
         content: list[dict[str, Any]] = [{"type": "text", "text": prompt}]
         for image in images or []:
@@ -144,6 +161,9 @@ class OpenAIClient:
             "seed": 7,
             "max_tokens": max_tokens,
         }
+        if sampling:  # vLLM calls the repeat penalty repetition_penalty
+            body["temperature"] = sampling.get("temperature", 0)
+            body["repetition_penalty"] = sampling.get("repeat_penalty", 1.0)
         if schema is not None:
             body["response_format"] = {
                 "type": "json_schema",
@@ -154,9 +174,12 @@ class OpenAIClient:
         try:
             response = self._http.post("/v1/chat/completions", json=body)
             response.raise_for_status()
-            text = response.json()["choices"][0]["message"]["content"]
+            choice = response.json()["choices"][0]
+            text = choice["message"]["content"]
         except (httpx.HTTPError, KeyError, IndexError, ValueError) as exc:
             raise ModelError(f"{model} failed: {exc}") from exc
+        if choice.get("finish_reason") == "length":
+            raise ModelRepetition(f"{model} ran past {max_tokens} tokens")
         return str(text)
 
 
@@ -167,10 +190,16 @@ class Ocr:
 
     def __call__(self, pages: list[bytes]) -> str:
         # One page per request keeps each image within the model's context.
-        texts = [
-            self.client.chat(self.model, OCR_PROMPT, images=[page], max_tokens=2048).strip() for page in pages
-        ]
-        return "\n\n".join(texts)
+        return "\n\n".join(self._read(page) for page in pages)
+
+    def _read(self, page: bytes) -> str:
+        try:
+            return self.client.chat(self.model, OCR_PROMPT, images=[page], max_tokens=2048).strip()
+        except ModelRepetition:
+            log.warning("%s looped on a page; reading it again with anti-repetition sampling", self.model)
+            return self.client.chat(
+                self.model, OCR_PROMPT, images=[page], max_tokens=2048, sampling=ANTI_REPETITION
+            ).strip()
 
 
 class Extractor:

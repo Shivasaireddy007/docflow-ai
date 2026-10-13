@@ -16,6 +16,7 @@ from django.utils import timezone
 from documents.models import Document, Job
 from pipeline import run
 from pipeline.files import UnsupportedFile
+from pipeline.providers import ModelRepetition
 from review import audit
 from review.decisions import decide_automatically
 
@@ -65,6 +66,10 @@ def execute(job: Job) -> None:
     except UnsupportedFile as exc:
         # Retrying can't fix a broken file.
         _fail(job, document, str(exc))
+        return
+    except ModelRepetition as exc:
+        # Already retried with anti-repetition sampling; the same input would loop again.
+        _fail(job, document, f"The model couldn't read this document: {exc}")
         return
     except Exception as exc:
         log.exception("Job %s for document %s failed (attempt %s)", job.pk, document.pk, job.attempts)
