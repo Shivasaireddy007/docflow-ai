@@ -13,3 +13,8 @@ node_modules/
 frontend/dist/
 frontend/test-results/
 frontend/playwright-report/
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log
