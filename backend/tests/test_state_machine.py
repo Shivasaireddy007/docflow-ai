@@ -99,7 +99,7 @@ def test_a_model_that_keeps_failing_ends_in_the_dead_letter_queue(machine: tuple
     status, events = execute(machine, "ModelKeepsFailing")
 
     assert status == "FAILED"
-    assert task_failures(events) == 4, "the first try and three retries"
+    assert task_failures(events) == 5, "the first try and four retries (MaxAttempts counts retries)"
     assert entered(events)[-4:] == ["Failed?", "Mark failed", "Send to dead-letter queue", "Failed"]
 
 
