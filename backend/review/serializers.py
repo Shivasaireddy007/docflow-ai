@@ -82,3 +82,36 @@ class RuleSetSerializer(serializers.ModelSerializer[RuleSet]):
 class PublishRulesSerializer(serializers.Serializer[Any]):
     rules = serializers.JSONField()
     note = serializers.CharField(required=False, allow_blank=True, default="", max_length=200)
+
+
+class NextSerializer(serializers.Serializer[Any]):
+    id = serializers.UUIDField()
+
+
+class ReviewDocumentSerializer(serializers.Serializer[Any]):
+    id = serializers.UUIDField()
+    filename = serializers.CharField()
+    status = serializers.ChoiceField(choices=Document.Status.choices)
+    page_count = serializers.IntegerField(allow_null=True)
+    created_at = serializers.DateTimeField()
+    claimed_by = serializers.CharField(allow_null=True)
+    extraction = serializers.DictField(
+        allow_null=True, help_text="The latest extraction (as in /documents/{id})"
+    )
+    decisions = DecisionSerializer(many=True)
+    audit = AuditEventSerializer(many=True)
+
+
+class StatsSerializer(serializers.Serializer[Any]):
+    by_status = serializers.DictField(child=serializers.IntegerField())
+    auto_approved_7d = serializers.IntegerField()
+    decided_by_rules_7d = serializers.IntegerField()
+    auto_approve_rate_7d = serializers.FloatField(allow_null=True)
+    reviewed_7d = serializers.IntegerField()
+    corrected_7d = serializers.IntegerField()
+
+
+class RulesListingSerializer(serializers.Serializer[Any]):
+    active = RuleSetSerializer()
+    versions = RuleSetSerializer(many=True)
+    types = serializers.DictField(child=serializers.ListField(child=serializers.CharField()))

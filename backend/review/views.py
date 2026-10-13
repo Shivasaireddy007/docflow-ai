@@ -26,10 +26,14 @@ from review.serializers import (
     DecisionSerializer,
     LoginSerializer,
     MeSerializer,
+    NextSerializer,
     PublishRulesSerializer,
     QueueItemSerializer,
     ReviewDecisionSerializer,
+    ReviewDocumentSerializer,
     RuleSetSerializer,
+    RulesListingSerializer,
+    StatsSerializer,
 )
 from tenants.access import IsReviewer, IsTenantAdmin, membership_of, reviewer
 from tenants.models import Membership
@@ -139,7 +143,7 @@ class QueueView(APIView):
 class NextView(APIView):
     permission_classes = [IsReviewer]
 
-    @extend_schema(request=None, responses={200: OpenApiTypes.OBJECT, 204: None})
+    @extend_schema(request=None, responses={200: NextSerializer, 204: None})
     def post(self, request: Request) -> Response:
         """Claim the next document to review (or keep your current one). `204` when the queue is empty."""
         document = decisions.claim_next(cast(User, request.user))
@@ -151,7 +155,7 @@ class NextView(APIView):
 class ReviewDocumentView(APIView):
     permission_classes = [IsReviewer]
 
-    @extend_schema(responses=OpenApiTypes.OBJECT)
+    @extend_schema(responses={200: ReviewDocumentSerializer, 404: OpenApiTypes.OBJECT})
     def get(self, request: Request, document_id: str) -> Response:
         """Everything a reviewer needs: the extraction, every decision so far, and the audit trail."""
         membership = reviewer(request)
@@ -210,7 +214,7 @@ class DecisionView(APIView):
 class StatsView(APIView):
     permission_classes = [IsReviewer]
 
-    @extend_schema(responses=OpenApiTypes.OBJECT)
+    @extend_schema(responses=StatsSerializer)
     def get(self, request: Request) -> Response:
         """Queue size, documents by status, and how many decisions the rules made on their own (7 days)."""
         membership = reviewer(request)
@@ -245,7 +249,7 @@ class RulesView(APIView):
     def get_permissions(self) -> list[Any]:
         return [IsTenantAdmin()] if self.request.method == "POST" else [IsReviewer()]
 
-    @extend_schema(responses=OpenApiTypes.OBJECT)
+    @extend_schema(responses=RulesListingSerializer)
     def get(self, request: Request) -> Response:
         """The active rules, every earlier version, and the rule types available."""
         membership = reviewer(request)

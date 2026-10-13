@@ -256,6 +256,12 @@ paths:
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/ReviewDocument'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
                 type: object
                 additionalProperties: {}
           description: ''
@@ -318,8 +324,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: {}
+                $ref: '#/components/schemas/Next'
           description: ''
         '204':
           description: No response body
@@ -357,8 +362,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: {}
+                $ref: '#/components/schemas/Stats'
           description: ''
   /api/v1/rules:
     get:
@@ -374,8 +378,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: {}
+                $ref: '#/components/schemas/RulesListing'
           description: ''
     post:
       operationId: v1_rules_create
@@ -414,6 +417,25 @@ paths:
           description: ''
 components:
   schemas:
+    AuditEvent:
+      type: object
+      properties:
+        actor:
+          type: string
+          description: '"pipeline", "api-key:<prefix>" or "user:<username>"'
+          maxLength: 120
+        action:
+          type: string
+          maxLength: 40
+        data: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor
+      - created_at
     Decision:
       type: object
       properties:
@@ -581,6 +603,14 @@ components:
       - role
       - tenant
       - username
+    Next:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+      required:
+      - id
     OutcomeEnum:
       enum:
       - auto_approved
@@ -681,6 +711,48 @@ components:
           maxLength: 1000
       required:
       - approve
+    ReviewDocument:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        filename:
+          type: string
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        page_count:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        claimed_by:
+          type: string
+          nullable: true
+        extraction:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: The latest extraction (as in /documents/{id})
+        decisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Decision'
+        audit:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEvent'
+      required:
+      - audit
+      - claimed_by
+      - created_at
+      - decisions
+      - extraction
+      - filename
+      - id
+      - page_count
+      - status
     RuleSet:
       type: object
       properties:
@@ -707,6 +779,51 @@ components:
       - created_by
       - rules
       - version
+    RulesListing:
+      type: object
+      properties:
+        active:
+          $ref: '#/components/schemas/RuleSet'
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleSet'
+        types:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+      required:
+      - active
+      - types
+      - versions
+    Stats:
+      type: object
+      properties:
+        by_status:
+          type: object
+          additionalProperties:
+            type: integer
+        auto_approved_7d:
+          type: integer
+        decided_by_rules_7d:
+          type: integer
+        auto_approve_rate_7d:
+          type: number
+          format: double
+          nullable: true
+        reviewed_7d:
+          type: integer
+        corrected_7d:
+          type: integer
+      required:
+      - auto_approve_rate_7d
+      - auto_approved_7d
+      - by_status
+      - corrected_7d
+      - decided_by_rules_7d
+      - reviewed_7d
     StatusEnum:
       enum:
       - queued
