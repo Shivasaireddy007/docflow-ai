@@ -9,7 +9,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_field
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import Throttled, ValidationError
+from rest_framework.exceptions import PermissionDenied, Throttled, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -71,6 +71,10 @@ class DocumentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
         """Upload a document for processing. `201` when new; `200` with the existing document if
         the same file was uploaded before. `413` if too large, `415` if not a supported type, `429`
         (with Retry-After) past the tenant's upload rate."""
+        if settings.DEMO_MODE:
+            raise PermissionDenied(
+                "This demo has no models to read new documents; review the ones already in it."
+            )
         tenant = tenant_of(request)
         wait = get_limiter().take(f"upload:{tenant.id}", Bucket.parse(settings.UPLOAD_RATE))
         if wait:
@@ -130,6 +134,8 @@ class DocumentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
     def reprocess(self, request: Request, pk: str | None = None) -> Response:
         """Run the document through the current pipeline again, e.g. after a model upgrade.
         `409` while queued or processing, and once a decision is final (approved or rejected)."""
+        if settings.DEMO_MODE:
+            raise PermissionDenied("This demo has no models to reprocess documents.")
         document = self.get_object()
         with transaction.atomic():
             locked = Document.objects.select_for_update().get(pk=document.pk)

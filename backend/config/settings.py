@@ -131,6 +131,12 @@ SESSION_COOKIE_SECURE = env_bool("SECURE_COOKIES")
 CSRF_COOKIE_SECURE = env_bool("SECURE_COOKIES")
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in env("CSRF_TRUSTED_ORIGINS").split(",") if o.strip()]
 
+# The public demo: the built review app is served by Django from WEB_DIR (one origin), and
+# DEMO_MODE refuses uploads and reprocessing, since there are no models to run them.
+WEB_DIR = env("WEB_DIR") or None
+DEMO_MODE = env_bool("DEMO_MODE")
+WHITENOISE_ROOT = WEB_DIR  # the app's index.html and assets, served at /
+
 # Uploads
 MAX_UPLOAD_BYTES = int(env("MAX_UPLOAD_BYTES", str(10 * 1024 * 1024)))
 MAX_PAGES = int(env("MAX_PAGES", "10"))

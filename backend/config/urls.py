@@ -1,7 +1,10 @@
+from pathlib import Path
+
+from django.conf import settings
 from django.contrib import admin
 from django.db import connection
-from django.http import HttpRequest, JsonResponse
-from django.urls import include, path
+from django.http import FileResponse, Http404, HttpRequest, JsonResponse
+from django.urls import include, path, re_path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from core.metrics import metrics_view
@@ -22,6 +25,13 @@ def ready(request: HttpRequest) -> JsonResponse:
     return JsonResponse({"status": "ok", "database": "ok"})
 
 
+def web_app(request: HttpRequest) -> FileResponse:
+    """The review app's index.html for its client-side routes (/review/<id>, /rules, ...)."""
+    if not settings.WEB_DIR:
+        raise Http404
+    return FileResponse((Path(settings.WEB_DIR) / "index.html").open("rb"), content_type="text/html")
+
+
 urlpatterns = [
     path("health", health),
     path("ready", ready),
@@ -32,3 +42,7 @@ urlpatterns = [
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="docs"),
 ]
+
+if settings.WEB_DIR:
+    # Last, so the API, admin and docs win; WhiteNoise serves the app's files before Django sees them.
+    urlpatterns.append(re_path(r"^(?!api/|admin/|static/|metrics$|health$|ready$).*$", web_app))
