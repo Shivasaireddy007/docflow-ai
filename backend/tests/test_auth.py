@@ -44,3 +44,16 @@ def test_wrong_malformed_and_revoked_keys_are_rejected(tenant: Tenant) -> None:
     client = APIClient()
     client.credentials(HTTP_AUTHORIZATION=f"Api-Key {plaintext}")
     assert client.get("/api/v1/documents").status_code == 401
+
+
+def test_create_reviewer_command(tenant: Tenant) -> None:
+    from django.contrib.auth.models import User
+    from django.core.management import call_command
+
+    from tenants.models import Membership
+
+    call_command("create_reviewer", "acme", "meera", "--admin", "--password", "s3cret-pass")
+
+    user = User.objects.get(username="meera")
+    assert user.check_password("s3cret-pass")
+    assert (user.membership.tenant, user.membership.role) == (tenant, Membership.Role.ADMIN)

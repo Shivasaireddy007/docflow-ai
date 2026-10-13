@@ -65,3 +65,18 @@ class ApiKey(models.Model):
     def revoke(self) -> None:
         self.revoked_at = timezone.now()
         self.save(update_fields=["revoked_at"])
+
+
+class Membership(models.Model):
+    """A person who works in a tenant's review queue. Admins can also change the rules."""
+
+    class Role(models.TextChoices):
+        REVIEWER = "reviewer"
+        ADMIN = "admin"
+
+    user = models.OneToOneField("auth.User", on_delete=models.CASCADE, related_name="membership")
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="members")
+    role = models.CharField(max_length=16, choices=Role.choices, default=Role.REVIEWER)
+
+    def __str__(self) -> str:
+        return f"{self.user} ({self.role}) in {self.tenant}"
