@@ -1,6 +1,6 @@
 {
  "run": {
-  "date": "2026-10-13T09:25:49+00:00",
+  "date": "2026-10-13T11:36:28+00:00",
   "dataset": "naver-clova-ix/cord-v2 (test, 100 receipts)",
   "pipeline_version": "ocr=qwen2.5vl:3b;llm=qwen2.5:7b;prompt=2;ocr-prompt=1",
   "rules": [
@@ -173,8 +173,8 @@
   "latency_ms": {
    "ocr_p50": 0.0,
    "ocr_p95": 1.0,
-   "extraction_p50": 11006.0,
-   "extraction_p95": 23830.7,
+   "extraction_p50": 0.0,
+   "extraction_p95": 0.0,
    "document_p50": null,
    "document_p95": null,
    "cached_document_p50": 0.0,
@@ -209,6 +209,78 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.5,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 60000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": 5455.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": 60000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "total": {
+     "value": 60000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -217,10 +289,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 1,
-   "extraction_ms": 5938,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -249,15 +321,79 @@
     3,
     3
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "J.STB",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 91000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 91000.0,
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 8268,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -286,15 +422,83 @@
     2,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 28000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 28000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 100000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 72000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 1.0,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 7152,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -323,6 +527,78 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "Dynamic NATURAL 1X",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 11000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 11000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 11000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "change": {
+     "value": 11000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -331,10 +607,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 5403,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -363,15 +639,91 @@
     0,
     3
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.5,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 194000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": 19400.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "total": {
+     "value": 174600.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 200000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 25400.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 8056,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -400,6 +752,74 @@
     0,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "TRAD KY TOAST CARTE",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 31000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 28182.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "change": {
+     "value": 2818.0,
+     "confidence": 0.25,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": false
+     }
+    }
+   },
    "confidence": 0.25,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -408,10 +828,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 1,
-   "extraction_ms": 5411,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -440,15 +860,83 @@
     3,
     3
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.5,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 46000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 50000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 4000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
-   "ocr_ms": 1,
-   "extraction_ms": 8371,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -477,6 +965,82 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": "RP",
+     "confidence": 0.6,
+     "checks": {
+      "grounded": true,
+      "valid": false,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 90900.0,
+     "confidence": 0.55,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": 100909.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 100909.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 111000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 10091.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.55,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -485,10 +1049,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 5724,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -517,15 +1081,83 @@
     3,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 45455.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": 4545.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 50000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": 0.0,
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 8946,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -554,6 +1186,78 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 38000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": 0.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "total": {
+     "value": 38000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 50000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "change": {
+     "value": 14000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -562,10 +1266,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 6854,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -594,15 +1298,91 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "Auntie Anne's",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 17000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 17000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 20000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 3000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 7658,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -631,15 +1411,79 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.5,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 230000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": 0.0,
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 7772,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -668,15 +1512,79 @@
     2,
     0
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "0571-1854 BLUS WANITA",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 120000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": 0.0,
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 12058,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -705,6 +1613,66 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "A FUNG\u00ae A FUNG",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 51300.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -713,10 +1681,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 11945,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -745,6 +1713,78 @@
     6,
     6
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 238000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": 17850.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 281435.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 200000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "change": {
+     "value": 18565.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -753,10 +1793,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 26352,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -785,15 +1825,83 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "XXI cafe",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 63000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 70000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 7000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
-   "ocr_ms": 5,
-   "extraction_ms": 12508,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -822,15 +1930,87 @@
     5,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 63636.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": 6364.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 70000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 100000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 30000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 1.0,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 20298,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -859,6 +2039,74 @@
     7,
     6
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 91000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": 0.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "total": {
+     "value": 91000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.25,
    "auto_approved": false,
    "other_rules_pass": true,
@@ -866,10 +2114,10 @@
     "confident"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 23698,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -898,15 +2146,87 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 156000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 156000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 156000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 0.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 1.0,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 8698,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -935,6 +2255,66 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": 16000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 176000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.5,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -943,10 +2323,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 11353,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -975,15 +2355,83 @@
     0,
     5
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 325600.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": 17908.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": 34351.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 377859.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
-   "ocr_ms": 1,
-   "extraction_ms": 16062,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1012,15 +2460,83 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 38000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 50000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 12000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 11609,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1049,6 +2565,70 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 40000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 100000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 60000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -1057,10 +2637,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 12571,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1089,6 +2669,62 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 135000.0,
+     "confidence": 0.25,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.25,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -1097,10 +2733,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 11412,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1129,6 +2765,66 @@
     3,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 118000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.5,
    "auto_approved": false,
    "other_rules_pass": true,
@@ -1136,10 +2832,10 @@
     "confident"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 14047,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1168,15 +2864,79 @@
     3,
     3
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 43000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 50000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 7000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 14586,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1205,6 +2965,82 @@
     3,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "Cap Cay",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 138000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 138000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 138000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 0.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": true,
@@ -1212,10 +3048,10 @@
     "confident"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 14276,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1244,15 +3080,83 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "FOOD & BEVERAGE",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 56000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": 5600.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 61600.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 11051,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1281,15 +3185,95 @@
     3,
     3
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "SAMGYOPSAL",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.5,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 369000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": 38745.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": 18450.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "discount": {
+     "value": 0.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "total": {
+     "value": 426195.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 14407,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1318,15 +3302,79 @@
     0,
     6
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "COLD OCHA",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 145900.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 145900.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 17450,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1355,6 +3403,78 @@
     2,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 28636.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "tax": {
+     "value": 28636.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 31500.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 50000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 18500.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -1363,10 +3483,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 10684,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1395,6 +3515,66 @@
     0,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": 100000.0,
+     "confidence": 0.5,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "total": {
+     "value": 113886.0,
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.5,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -1403,10 +3583,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 1,
-   "extraction_ms": 7142,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1435,6 +3615,74 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 24000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 26000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 50000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 24000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -1443,10 +3691,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 1,
-   "extraction_ms": 8296,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1475,6 +3723,78 @@
     3,
     3
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 117500.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "tax": {
+     "value": 11070.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "service_charge": {
+     "value": 19557.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "discount": {
+     "value": 67000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "total": {
+     "value": 148127.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -1483,10 +3803,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 14175,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1515,15 +3835,95 @@
     0,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "Ash Chick",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.5,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 85000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": 8500.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 93500.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 100000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 6500.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 10536,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1552,6 +3952,74 @@
     0,
     4
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.5,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 104000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 154000.0,
+     "confidence": 0.55,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 50000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.55,
    "auto_approved": false,
    "other_rules_pass": true,
@@ -1559,10 +4027,10 @@
     "confident"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 15047,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1591,15 +4059,79 @@
     2,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 40000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 100000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 60000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 1,
-   "extraction_ms": 10052,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1628,15 +4160,83 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.5,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 20000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 50000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 30000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 8658,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1665,6 +4265,66 @@
     9,
     9
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": 42135.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 664329.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -1673,10 +4333,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 1,
-   "extraction_ms": 29663,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1705,6 +4365,74 @@
     3,
     3
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "HPL",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": "HKG",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": 1555200.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "total": {
+     "value": 7777600.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -1713,11 +4441,11 @@
     "totals-add-up",
     "under-limit"
    ],
-   "ocr_ms": 1,
-   "extraction_ms": 16153,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1746,6 +4474,62 @@
     1,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "Snack Lestari",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.0,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -1756,10 +4540,10 @@
     "under-limit"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 9398,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1788,17 +4572,81 @@
     0,
     10
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 316017.0,
+     "confidence": 0.55,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": 46982.68,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 365000.0,
+     "confidence": 0.55,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.55,
    "auto_approved": false,
    "other_rules_pass": true,
    "failed_rules": [
     "confident"
    ],
-   "ocr_ms": 1,
-   "extraction_ms": 22283,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1827,6 +4675,78 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.5,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 15000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 16500.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 50000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 33500.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -1834,11 +4754,11 @@
     "confident",
     "totals-add-up"
    ],
-   "ocr_ms": 1,
-   "extraction_ms": 9720,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1867,6 +4787,86 @@
     3,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "KB",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 165000.0,
+     "confidence": 0.25,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "tax": {
+     "value": 15000.0,
+     "confidence": 0.25,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 165000.0,
+     "confidence": 0.25,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 200000.0,
+     "confidence": 0.55,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 35000.0,
+     "confidence": 0.55,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.25,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -1875,10 +4875,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 1,
-   "extraction_ms": 13882,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1907,15 +4907,79 @@
     0,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 30000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 50000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 20000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
-   "ocr_ms": 1,
-   "extraction_ms": 8384,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1944,15 +5008,79 @@
     4,
     4
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 88000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 88000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 0.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
-   "ocr_ms": 1,
-   "extraction_ms": 16054,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -1981,15 +5109,79 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 40000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 40000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 0.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
-   "ocr_ms": 1,
-   "extraction_ms": 12889,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2018,17 +5210,73 @@
     3,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 63000.0,
+     "confidence": 0.55,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.5,
    "auto_approved": false,
    "other_rules_pass": true,
    "failed_rules": [
     "confident"
    ],
-   "ocr_ms": 1,
-   "extraction_ms": 13613,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2057,6 +5305,78 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "KOI Cafe",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 22728.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 25000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 100000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 75000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -2064,11 +5384,11 @@
     "confident",
     "totals-add-up"
    ],
-   "ocr_ms": 1,
-   "extraction_ms": 9235,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2097,15 +5417,83 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 23000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 23000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 50000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 27000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 1.0,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 11836,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2134,6 +5522,66 @@
     2,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "Cadbury",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 694250.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.0,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -2144,10 +5592,10 @@
     "under-limit"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 11454,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2176,6 +5624,74 @@
     4,
     4
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "Souris",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.5,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": 30365.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 334000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.5,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -2183,11 +5699,11 @@
     "confident",
     "totals-add-up"
    ],
-   "ocr_ms": 1,
-   "extraction_ms": 16802,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2216,15 +5732,83 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 40000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 40000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 100000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 60000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 1.0,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
-   "ocr_ms": 1,
-   "extraction_ms": 11767,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2253,15 +5837,87 @@
     3,
     3
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "Kopidegit",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 107000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": 11235.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": 5350.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 123585.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
-   "ocr_ms": 1,
-   "extraction_ms": 13744,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2290,6 +5946,78 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "KACANG HERAH",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 10000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 10000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 10000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "change": {
+     "value": 10000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -2298,10 +6026,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 8443,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2330,15 +6058,71 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 54000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 11477,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2367,6 +6151,86 @@
     3,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "AIR MINERAL",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": "TL",
+     "confidence": 0.6,
+     "checks": {
+      "grounded": true,
+      "valid": false,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 8181.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "tax": {
+     "value": 818.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 8999.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 10000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 1001.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": true,
@@ -2374,10 +6238,10 @@
     "confident"
    ],
    "ocr_ms": 1,
-   "extraction_ms": 13305,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2406,17 +6270,73 @@
     0,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 42000.0,
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.95,
    "auto_approved": false,
    "other_rules_pass": false,
    "failed_rules": [
     "totals-add-up"
    ],
-   "ocr_ms": 1,
-   "extraction_ms": 8655,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2445,6 +6365,78 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "PHO BO TAI",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 55000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 60500.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 100000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 39500.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -2452,11 +6444,11 @@
     "confident",
     "totals-add-up"
    ],
-   "ocr_ms": 1,
-   "extraction_ms": 8024,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2485,6 +6477,70 @@
     7,
     9
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 618490.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "tax": {
+     "value": 61849.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 680500.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.25,
    "auto_approved": false,
    "other_rules_pass": true,
@@ -2492,10 +6548,10 @@
     "confident"
    ],
    "ocr_ms": 1,
-   "extraction_ms": 30375,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2524,15 +6580,75 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 26250.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 26250.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 1.0,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
-   "ocr_ms": 1,
-   "extraction_ms": 11479,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2561,6 +6677,66 @@
     3,
     6
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "Den-A",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 12500.0,
+     "confidence": 0.55,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.5,
    "auto_approved": false,
    "other_rules_pass": true,
@@ -2568,10 +6744,10 @@
     "confident"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 18436,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2600,15 +6776,79 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 48000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 50000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 2000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 11586,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2637,15 +6877,87 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "Kopi Susu Kampung",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 57000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 57000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 60000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 3000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 12128,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2674,15 +6986,75 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 16000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": 34000.0,
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
-   "ocr_ms": 1,
-   "extraction_ms": 8102,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2711,15 +7083,79 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.5,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 13000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 13000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 1.0,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 7814,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2748,6 +7184,78 @@
     1,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "PILLOW DURIA",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 36364.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 40000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 50000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 10000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -2756,10 +7264,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 9099,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2788,6 +7296,70 @@
     1,
     0
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "2005-CHEESE JOHN",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 9500.0,
+     "confidence": 0.55,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 9500.0,
+     "confidence": 0.5,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.5,
    "auto_approved": false,
    "other_rules_pass": true,
@@ -2795,10 +7367,10 @@
     "confident"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 8326,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2827,6 +7399,74 @@
     0,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "ICED TT",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 50000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 30000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "change": {
+     "value": 20000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -2835,10 +7475,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 6683,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2867,15 +7507,83 @@
     3,
     3
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": "2017-03-23",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 74000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 100000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 26000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
-   "ocr_ms": 1,
-   "extraction_ms": 13671,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2904,6 +7612,74 @@
     8,
     8
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 1343000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": 142358.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": 80580.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 1565938.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 1.0,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -2911,10 +7687,10 @@
     "under-limit"
    ],
    "ocr_ms": 1,
-   "extraction_ms": 27511,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2943,6 +7719,74 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 198000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 198000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 200200.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "change": {
+     "value": 22000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -2951,10 +7795,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 7515,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -2983,6 +7827,78 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "Choco Devil",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 15909.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 15909.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 20000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "change": {
+     "value": 2500.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -2991,10 +7907,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 7234,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3023,15 +7939,79 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 22000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 25000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 3000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 9965,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3060,6 +8040,70 @@
     0,
     4
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 85000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "tax": {
+     "value": 30024.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 330264.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -3068,10 +8112,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 1,
-   "extraction_ms": 19244,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3100,15 +8144,79 @@
     6,
     6
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 256363.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": 25637.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 282000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 1.0,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 22721,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3137,6 +8245,62 @@
     3,
     4
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 110000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.5,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -3145,10 +8309,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 12809,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3177,6 +8341,70 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "TRIPPLE CHEESE",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 17000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.0,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -3186,11 +8414,11 @@
     "totals-add-up",
     "under-limit"
    ],
-   "ocr_ms": 1,
-   "extraction_ms": 8713,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3219,15 +8447,79 @@
     2,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 30000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 30000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 0.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
-   "ocr_ms": 1,
-   "extraction_ms": 10827,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3256,15 +8548,75 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 22000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 22000.0,
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
-   "ocr_ms": 1,
-   "extraction_ms": 10470,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3293,15 +8645,87 @@
     0,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "Viet Milk Coffee",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 25000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 25000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 25000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 0.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
-   "ocr_ms": 1,
-   "extraction_ms": 9719,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3330,15 +8754,71 @@
     3,
     3
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 50000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 13144,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3367,15 +8847,79 @@
     3,
     3
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 385000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 385000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": 0.0,
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 14086,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3404,6 +8948,74 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": 2090.0,
+     "confidence": 0.25,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 20909.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 25000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "change": {
+     "value": 2091.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    }
+   },
    "confidence": 0.25,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -3412,10 +9024,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 7495,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3444,6 +9056,78 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "Kroket",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 36000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": 3600.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 39600.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.55,
    "auto_approved": false,
    "other_rules_pass": true,
@@ -3451,10 +9135,10 @@
     "confident"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 10961,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3483,15 +9167,83 @@
     11,
     11
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 179500.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": 17950.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 197450.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 197450.0,
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 1,
-   "extraction_ms": 33645,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3520,15 +9272,87 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "BreadLife",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 22000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 22000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 52000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 30000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 10741,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3557,15 +9381,83 @@
     0,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "PHO TAI CHIN",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 36500.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": 3650.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 40150.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
-   "ocr_ms": 1,
-   "extraction_ms": 9307,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3594,6 +9486,70 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "Auntie Anne's",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 47000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": 47000.0,
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    }
+   },
    "confidence": 0.0,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -3603,11 +9559,11 @@
     "totals-add-up",
     "under-limit"
    ],
-   "ocr_ms": 1,
-   "extraction_ms": 10909,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3636,15 +9592,79 @@
     2,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 40000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 50000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 10000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 10324,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3673,6 +9693,74 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "B17",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 26818.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 29500.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 29500.0,
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -3681,10 +9769,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 8665,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3713,6 +9801,62 @@
     0,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "BAKSO BNGKS",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.0,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -3723,10 +9867,10 @@
     "under-limit"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 9548,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3755,15 +9899,83 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "TICKET CP",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 240000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 250000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 10000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 9437,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3792,15 +10004,79 @@
     1,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 16363.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "tax": {
+     "value": 1636.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 17999.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 1.0,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 7907,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3829,6 +10105,70 @@
     3,
     4
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "PHO Noodle Pho No",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": 700.0,
+     "confidence": 0.25,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 158000.0,
+     "confidence": 0.25,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.25,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -3837,10 +10177,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 13838,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3869,15 +10209,87 @@
     2,
     2
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "A FUNG",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": 5618.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 61799.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 62000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 201.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
    "ocr_ms": 0,
-   "extraction_ms": 10916,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3906,15 +10318,79 @@
     2,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 41000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "cash_paid": {
+     "value": 50000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "change": {
+     "value": 9000.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    }
+   },
    "confidence": 0.95,
    "auto_approved": true,
    "other_rules_pass": true,
    "failed_rules": [],
-   "ocr_ms": 1,
-   "extraction_ms": 10119,
+   "ocr_ms": 0,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3943,6 +10419,70 @@
     3,
     3
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "MELIHU AYAM",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "tax": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 55000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 55000.0,
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.5,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -3951,10 +10491,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 14164,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -3983,6 +10523,78 @@
     3,
     3
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "Pancier",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 104900.0,
+     "confidence": 0.25,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "tax": {
+     "value": 22790.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "service_charge": {
+     "value": 12900.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "discount": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "total": {
+     "value": 250690.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "change": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    }
+   },
    "confidence": 0.25,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -3991,10 +10603,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 1,
-   "extraction_ms": 15395,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   },
   {
@@ -4023,6 +10635,90 @@
     6,
     1
    ],
+   "scored": {
+    "merchant_name": {
+     "value": "FL-Xmas 30 Off",
+     "confidence": 0.95,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "currency": {
+     "value": "IDR",
+     "confidence": 0.5,
+     "checks": {
+      "grounded": false,
+      "valid": true,
+      "consistent": null
+     }
+    },
+    "receipt_date": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "subtotal": {
+     "value": 68180.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "tax": {
+     "value": 6818.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "service_charge": {
+     "value": null,
+     "confidence": null,
+     "checks": null
+    },
+    "discount": {
+     "value": 0.0,
+     "confidence": 1.0,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": true
+     }
+    },
+    "total": {
+     "value": 75000.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "cash_paid": {
+     "value": 0.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    },
+    "change": {
+     "value": 0.0,
+     "confidence": 0.7,
+     "checks": {
+      "grounded": true,
+      "valid": true,
+      "consistent": false
+     }
+    }
+   },
    "confidence": 0.7,
    "auto_approved": false,
    "other_rules_pass": false,
@@ -4031,10 +10727,10 @@
     "totals-add-up"
    ],
    "ocr_ms": 0,
-   "extraction_ms": 20434,
+   "extraction_ms": 0,
    "cached": {
     "ocr": true,
-    "extraction": false
+    "extraction": true
    }
   }
  ]
