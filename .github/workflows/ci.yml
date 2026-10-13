@@ -64,6 +64,59 @@ jobs:
       - run: npm test
       - run: npm run build
 
+  aws:
+    # The AWS side without an AWS account: Terraform checked and tested against a mocked provider,
+    # the state machine run in Step Functions Local, and the Lambda image invoked locally.
+    runs-on: ubuntu-latest
+    services:
+      stepfunctions:
+        image: amazon/aws-stepfunctions-local:2.0.0
+        ports: ["8083:8083"]
+        env:
+          SFN_MOCK_CONFIG: /mock/mock-config.json
+        volumes:
+          - ${{ github.workspace }}/infra/statemachine:/mock
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+    env:
+      REDIS_TEST_URL: redis://127.0.0.1:6379/14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.5
+      - uses: terraform-linters/setup-tflint@v4
+      - name: Terraform format, validate, lint and test
+        working-directory: infra
+        run: |
+          terraform fmt -check -recursive
+          terraform init -backend=false -input=false
+          terraform validate
+          tflint --init && tflint --format compact
+          terraform test
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.0"
+      - name: State machine in Step Functions Local
+        working-directory: backend
+        env:
+          SFN_LOCAL_URL: http://localhost:8083
+        run: |
+          docker restart ${{ job.services.stepfunctions.id }}  # the mock config is checked out after services start
+          for i in $(seq 1 30); do curl -s localhost:8083 > /dev/null && break; sleep 1; done
+          uv sync --locked
+          uv run pytest -rs tests/test_state_machine.py
+      - name: Lambda image runs a step
+        run: |
+          docker build -f backend/lambdas/Dockerfile -t docflow-pipeline backend
+          docker run -d --name step -p 9000:8080 docflow-pipeline lambdas.handlers.prepare
+          sleep 3
+          reply=$(curl -s -X POST localhost:9000/2015-03-31/functions/function/invocations \
+            -d '{"bucket": "docflow-documents", "key": "not/an/upload.png"}')
+          echo "$reply"
+          echo "$reply" | jq -e '.errorType == "UnsupportedFile"'
+
   stack:
     # The whole stack in Docker Compose, with an Ollama stand-in instead of model weights.
     runs-on: ubuntu-latest

@@ -1,0 +1,67 @@
+{
+  "StateMachines": {
+    "docflow": {
+      "TestCases": {
+        "HappyPath": {
+          "Prepare": "Prepared",
+          "OCR": "Read",
+          "Extract fields": "Extracted",
+          "Decide": "Approved"
+        },
+        "AlreadyProcessed": {
+          "Prepare": "AlreadyProcessed"
+        },
+        "BusyModelRecovers": {
+          "Prepare": "Prepared",
+          "OCR": "BusyTwiceThenRead",
+          "Extract fields": "Extracted",
+          "Decide": "Approved"
+        },
+        "ModelKeepsFailing": {
+          "Prepare": "Prepared",
+          "OCR": "Read",
+          "Extract fields": "AlwaysFails",
+          "Mark failed": "Updated",
+          "Send to dead-letter queue": "Sent"
+        },
+        "UnusableUpload": {
+          "Prepare": "NotADocument",
+          "Send to dead-letter queue": "Sent"
+        }
+      }
+    }
+  },
+  "MockedResponses": {
+    "Prepared": {
+      "0": { "Return": { "StatusCode": 200, "Payload": { "tenant": "acme", "doc_hash": "abc", "pk": "acme#abc", "skip": false, "pages": ["work/acme/abc/page-1.png"] } } }
+    },
+    "AlreadyProcessed": {
+      "0": { "Return": { "StatusCode": 200, "Payload": { "tenant": "acme", "doc_hash": "abc", "pk": "acme#abc", "skip": true } } }
+    },
+    "Read": {
+      "0": { "Return": { "StatusCode": 200, "Payload": { "tenant": "acme", "doc_hash": "abc", "pk": "acme#abc", "ocr_key": "work/acme/abc/ocr.txt" } } }
+    },
+    "BusyTwiceThenRead": {
+      "0-1": { "Throw": { "Error": "ModelBusy", "Cause": "qwen2.5vl is at its request limit" } },
+      "2": { "Return": { "StatusCode": 200, "Payload": { "tenant": "acme", "doc_hash": "abc", "pk": "acme#abc", "ocr_key": "work/acme/abc/ocr.txt" } } }
+    },
+    "Extracted": {
+      "0": { "Return": { "StatusCode": 200, "Payload": { "tenant": "acme", "doc_hash": "abc", "pk": "acme#abc", "ocr_key": "work/acme/abc/ocr.txt", "fields_key": "work/acme/abc/fields.json" } } }
+    },
+    "AlwaysFails": {
+      "0-4": { "Throw": { "Error": "ModelError", "Cause": "model server unreachable" } }
+    },
+    "Approved": {
+      "0": { "Return": { "StatusCode": 200, "Payload": { "pk": "acme#abc", "status": "auto_approved", "confidence": 0.95 } } }
+    },
+    "NotADocument": {
+      "0": { "Throw": { "Error": "UnsupportedFile", "Cause": "Not a PDF, PNG, JPEG or WebP file." } }
+    },
+    "Updated": {
+      "0": { "Return": {} }
+    },
+    "Sent": {
+      "0": { "Return": { "MessageId": "00000000-0000-0000-0000-000000000000" } }
+    }
+  }
+}
