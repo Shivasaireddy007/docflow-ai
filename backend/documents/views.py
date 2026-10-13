@@ -14,7 +14,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from core.ratelimit import Bucket, get_limiter
-from documents import jobs
+from documents import jobs, processing
 from documents.models import Document, Job
 from documents.serializers import (
     DocumentDetailSerializer,
@@ -112,7 +112,7 @@ class DocumentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
                     page_count=pages,
                     storage_key=key,
                 )
-                jobs.enqueue(document)
+                processing.submit(document)
                 audit.record(
                     tenant, audit.actor_of(request.user), "uploaded", document, filename=document.filename
                 )
@@ -135,13 +135,17 @@ class DocumentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
             locked = Document.objects.select_for_update().get(pk=document.pk)
             if locked.status in (Document.Status.APPROVED, Document.Status.REJECTED):
                 return Response({"detail": f"Already {locked.status}."}, status=status.HTTP_409_CONFLICT)
-            if document.jobs.filter(status__in=[Job.Status.QUEUED, Job.Status.RUNNING]).exists():
+            in_flight = locked.status in (Document.Status.QUEUED, Document.Status.PROCESSING)
+            if in_flight or document.jobs.filter(status__in=[Job.Status.QUEUED, Job.Status.RUNNING]).exists():
                 return Response({"detail": "Already queued or processing."}, status=status.HTTP_409_CONFLICT)
-            jobs.enqueue(document)
+            if settings.PROCESSING_BACKEND == "worker":
+                jobs.enqueue(document)
             Document.objects.filter(pk=document.pk).update(
                 status=Document.Status.QUEUED, error="", claimed_by=None, claim_expires_at=None
             )
             audit.record(document.tenant, audit.actor_of(request.user), "reprocess_requested", document)
+        if settings.PROCESSING_BACKEND != "worker":
+            processing.resubmit(document)  # a network call: after the commit, holding no locks
         document.refresh_from_db()
         return Response(DocumentSerializer(document).data, status=status.HTTP_202_ACCEPTED)
 

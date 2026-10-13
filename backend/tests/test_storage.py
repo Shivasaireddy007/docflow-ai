@@ -28,7 +28,7 @@ def test_filesystem_storage_refuses_keys_outside_its_root(tmp_path: Path) -> Non
 
 
 def test_keys_are_per_tenant_and_content_addressed() -> None:
-    assert document_key("t1", "ab12") == "tenants/t1/documents/ab12"
+    assert document_key("t1", "ab12") == "tenants/t1/uploads/ab12"
 
 
 def test_ensure_bucket_creates_it_once(settings: object) -> None:

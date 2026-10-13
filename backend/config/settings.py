@@ -164,6 +164,13 @@ UPLOAD_RATE = env("UPLOAD_RATE", "30/0.5")  # per tenant: bursts of 30, then one
 LOGIN_RATE = env("LOGIN_RATE", "5/0.0167")  # per username and address: 5, then one a minute
 MODEL_RATE = env("MODEL_RATE", "8/4")  # per model, across all workers: protects the model server
 
+# Where documents are processed: "worker" (the PostgreSQL job queue and `run_worker`) or
+# "stepfunctions" (AWS: an upload to S3 starts the state machine, which reports back to
+# /api/v1/internal/pipeline-results, signed with CALLBACK_SECRET).
+PROCESSING_BACKEND = env("PROCESSING_BACKEND", "worker")
+STATE_MACHINE_ARN = env("STATE_MACHINE_ARN")
+CALLBACK_SECRET = env("CALLBACK_SECRET")
+
 # Processing jobs
 JOB_MAX_ATTEMPTS = int(env("JOB_MAX_ATTEMPTS", "4"))
 JOB_LOCK_TIMEOUT_SECONDS = int(env("JOB_LOCK_TIMEOUT_SECONDS", "600"))

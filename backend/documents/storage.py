@@ -1,7 +1,8 @@
 """Where uploaded files live: S3 (or MinIO) in deployments, a local folder in development and tests.
 
-Keys are content-addressed per tenant (`tenants/<tenant>/documents/<sha256>`), so storing the same
-file twice is harmless and a half-finished upload can simply be retried.
+Keys are content-addressed per tenant (`tenants/<tenant>/uploads/<sha256>`), so storing the same
+file twice is harmless and a half-finished upload can simply be retried. On AWS, an object
+arriving under uploads/ is what starts the processing pipeline.
 """
 
 from functools import cache
@@ -49,7 +50,7 @@ class S3Storage:
 
 
 def document_key(tenant_id: object, sha256: str) -> str:
-    return f"tenants/{tenant_id}/documents/{sha256}"
+    return f"tenants/{tenant_id}/uploads/{sha256}"
 
 
 @cache
