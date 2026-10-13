@@ -96,6 +96,10 @@ def test_the_report_renders() -> None:
     assert "| Approved automatically | 1 (50%) |" in markdown
     assert "| 0.90 | 1 (50%) | 0 | 0% |" in markdown
     assert "about 4.2 hours" in markdown
+    assert "Line-item amounts: precision 100%, recall 50%" in markdown
+
+    result["summary"]["line_items"] = {"matched": 0, "precision": 0.0, "recall": None}
+    assert "Line items: not labelled in this dataset." in report.render(result), "SROIE has none"
 
 
 def test_sroie_labels_cover_merchant_date_and_total() -> None:

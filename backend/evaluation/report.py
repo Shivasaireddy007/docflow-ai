@@ -84,7 +84,9 @@ def render(result: dict[str, Any]) -> str:
     lines += [
         "",
         f"Line-item amounts: precision {pct(items['precision'])}, recall {pct(items['recall'])} "
-        f"({items['matched']} matched).",
+        f"({items['matched']} matched)."
+        if items["recall"] is not None
+        else "Line items: not labelled in this dataset.",
         "",
         "## Speed",
         "",
