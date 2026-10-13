@@ -69,13 +69,6 @@ jobs:
     # the state machine run in Step Functions Local, and the Lambda image invoked locally.
     runs-on: ubuntu-latest
     services:
-      stepfunctions:
-        image: amazon/aws-stepfunctions-local:2.0.0
-        ports: ["8083:8083"]
-        env:
-          SFN_MOCK_CONFIG: /mock/mock-config.json
-        volumes:
-          - ${{ github.workspace }}/infra/statemachine:/mock
       redis:
         image: redis:7-alpine
         ports: ["6379:6379"]
@@ -103,7 +96,8 @@ jobs:
         env:
           SFN_LOCAL_URL: http://localhost:8083
         run: |
-          docker restart ${{ job.services.stepfunctions.id }}  # the mock config is checked out after services start
+          docker run -d --name sfn -p 8083:8083 -e SFN_MOCK_CONFIG=/mock/mock-config.json \
+            -v "$GITHUB_WORKSPACE/infra/statemachine:/mock:ro" amazon/aws-stepfunctions-local:2.0.0
           for i in $(seq 1 30); do curl -s localhost:8083 > /dev/null && break; sleep 1; done
           uv sync --locked
           uv run pytest -rs tests/test_state_machine.py
