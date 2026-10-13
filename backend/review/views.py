@@ -2,6 +2,7 @@ from datetime import timedelta
 from typing import Any, cast
 from uuid import UUID
 
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db.models import Count, OuterRef, Q, Subquery
@@ -11,11 +12,13 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
+from rest_framework.exceptions import Throttled
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from core.ratelimit import Bucket, get_limiter
 from documents.models import Document, Extraction
 from documents.serializers import ExtractionSerializer
 from review import audit, decisions
@@ -68,6 +71,11 @@ class LoginView(APIView):
         """Sign in a reviewer; starts a session (cookie)."""
         data = LoginSerializer(data=request.data)
         data.is_valid(raise_exception=True)
+        # Per username and address, so guessing one account's password is slow but a busy office
+        # behind one address isn't locked out.
+        who = f"login:{data.validated_data['username'].lower()}:{request.META.get('REMOTE_ADDR', '')}"
+        if wait := get_limiter().take(who, Bucket.parse(settings.LOGIN_RATE)):
+            raise Throttled(wait=wait, detail="Too many sign-in attempts; try again shortly.")
         user = authenticate(
             request, username=data.validated_data["username"], password=data.validated_data["password"]
         )

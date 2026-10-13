@@ -149,6 +149,17 @@ EXTRACTION_MODEL = env("EXTRACTION_MODEL", "qwen2.5:7b")
 MODEL_TIMEOUT_SECONDS = float(env("MODEL_TIMEOUT_SECONDS", "180"))
 # Bump when prompts or the schema change, so cached and stored results are tied to what produced them.
 PROMPT_VERSION = env("PROMPT_VERSION", "1")
+OCR_PROMPT_VERSION = env("OCR_PROMPT_VERSION", "1")
+
+# Redis: the model-result cache and rate limits. Both keep working (uncached, unlimited) if it's down.
+REDIS_URL = env("REDIS_URL", "redis://127.0.0.1:6379/2")
+RESULT_CACHE_ENABLED = env_bool("RESULT_CACHE_ENABLED", True)
+RESULT_CACHE_SECONDS = int(env("RESULT_CACHE_SECONDS", str(30 * 24 * 3600)))
+
+# Token buckets: "<capacity>/<refill per second>"
+UPLOAD_RATE = env("UPLOAD_RATE", "30/0.5")  # per tenant: bursts of 30, then one every 2 s
+LOGIN_RATE = env("LOGIN_RATE", "5/0.0167")  # per username and address: 5, then one a minute
+MODEL_RATE = env("MODEL_RATE", "8/4")  # per model, across all workers: protects the model server
 
 # Processing jobs
 JOB_MAX_ATTEMPTS = int(env("JOB_MAX_ATTEMPTS", "4"))

@@ -8,6 +8,7 @@ to the receipt JSON schema, so the model can't return free text.
 import base64
 import json
 import logging
+from collections.abc import Callable
 from typing import Any, Protocol
 
 import httpx
@@ -49,8 +50,15 @@ class ExtractionProvider(Protocol):
 
 
 class OllamaClient:
-    def __init__(self, base_url: str, timeout: float, transport: httpx.BaseTransport | None = None) -> None:
+    def __init__(
+        self,
+        base_url: str,
+        timeout: float,
+        transport: httpx.BaseTransport | None = None,
+        before_call: Callable[[str], None] | None = None,
+    ) -> None:
         self._http = httpx.Client(base_url=base_url, timeout=timeout, transport=transport)
+        self._before_call = before_call  # e.g. wait for a rate-limit token
 
     def chat(
         self,
@@ -75,6 +83,8 @@ class OllamaClient:
         }
         if schema is not None:
             body["format"] = schema
+        if self._before_call is not None:
+            self._before_call(model)
         try:
             response = self._http.post("/api/chat", json=body)
             response.raise_for_status()
@@ -113,11 +123,33 @@ class OllamaExtractor:
         return data
 
 
+def ocr_version() -> str:
+    return f"{settings.OCR_MODEL};ocr-prompt={settings.OCR_PROMPT_VERSION}"
+
+
+def extraction_version() -> str:
+    return f"{settings.EXTRACTION_MODEL};prompt={settings.PROMPT_VERSION}"
+
+
 def pipeline_version() -> str:
-    """Identifies what produced a result; stored with it and part of every cache key."""
-    return f"ocr={settings.OCR_MODEL};llm={settings.EXTRACTION_MODEL};prompt={settings.PROMPT_VERSION}"
+    """Identifies what produced a result; stored with it. Each step's part keys its cache entries."""
+    return (
+        f"ocr={settings.OCR_MODEL};llm={settings.EXTRACTION_MODEL};"
+        f"prompt={settings.PROMPT_VERSION};ocr-prompt={settings.OCR_PROMPT_VERSION}"
+    )
+
+
+class ModelBusy(ModelError):
+    """No rate-limit token within the wait: the job is retried later rather than piling on."""
+
+
+def _rate_limited(model: str) -> None:
+    from core.ratelimit import Bucket, get_limiter
+
+    if not get_limiter().wait(f"model:{model}", Bucket.parse(settings.MODEL_RATE), timeout=30):
+        raise ModelBusy(f"{model} is at its request limit")
 
 
 def default_providers() -> tuple[OcrProvider, ExtractionProvider]:
-    client = OllamaClient(settings.OLLAMA_URL, settings.MODEL_TIMEOUT_SECONDS)
+    client = OllamaClient(settings.OLLAMA_URL, settings.MODEL_TIMEOUT_SECONDS, before_call=_rate_limited)
     return OllamaOcr(client, settings.OCR_MODEL), OllamaExtractor(client, settings.EXTRACTION_MODEL)

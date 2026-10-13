@@ -9,10 +9,11 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_field
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import Throttled, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from core.ratelimit import Bucket, get_limiter
 from documents import jobs
 from documents.models import Document, Job
 from documents.serializers import (
@@ -68,7 +69,12 @@ class DocumentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
     )
     def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """Upload a document for processing. `201` when new; `200` with the existing document if
-        the same file was uploaded before. `413` if too large, `415` if not a supported type."""
+        the same file was uploaded before. `413` if too large, `415` if not a supported type, `429`
+        (with Retry-After) past the tenant's upload rate."""
+        tenant = tenant_of(request)
+        wait = get_limiter().take(f"upload:{tenant.id}", Bucket.parse(settings.UPLOAD_RATE))
+        if wait:
+            raise Throttled(wait=wait, detail="Too many uploads; try again shortly.")
         upload = request.FILES.get("file")
         if upload is None:
             raise ValidationError({"file": "Attach the document as `file`."})
@@ -88,7 +94,6 @@ class DocumentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
         if pages > settings.MAX_PAGES:
             raise ValidationError({"file": f"Documents can have up to {settings.MAX_PAGES} pages."})
 
-        tenant = tenant_of(request)
         sha256 = hashlib.sha256(data).hexdigest()
         if existing := Document.objects.filter(tenant=tenant, sha256=sha256).first():
             return self._uploaded(existing, duplicate=True)
