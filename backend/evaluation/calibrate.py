@@ -105,6 +105,16 @@ def evaluate(w: list[float], data: list[tuple[list[float], float, bool]]) -> dic
     }
 
 
+def verdict(held_out: dict[str, Any]) -> str:
+    """What the held-out numbers mean for the pipeline: only a better score on new data counts."""
+    if held_out["fitted"]["ece"] < held_out["heuristic"]["ece"]:
+        return "On receipts it wasn't fitted to, the fitted score is better calibrated."
+    return (
+        "On receipts it wasn't fitted to, the hand-set penalties are better calibrated, so the "
+        "pipeline keeps them."
+    )
+
+
 def render(train: str, test: str, w: list[float], held_out: dict[str, Any], in_sample: dict[str, Any]) -> str:
     def rows(table: list[dict[str, Any]]) -> list[str]:
         return [f"| {r['bin']} | {r['fields']} | {r['predicted']:.2f} | {r['correct']:.0%} |" for r in table]
@@ -115,12 +125,16 @@ def render(train: str, test: str, w: list[float], held_out: dict[str, Any], in_s
         f"Fitted on `{train}` ({in_sample['fields']} labelled fields); tested on `{test}` "
         f"({held_out['fields']} fields from a different dataset, never seen in fitting).",
         "",
-        "| On the held-out dataset | Hand-set penalties | Fitted |",
+        "| | Hand-set penalties | Fitted |",
         "|---|---|---|",
-        f"| Expected calibration error (lower is better) | {held_out['heuristic']['ece']:.3f} | "
-        f"**{held_out['fitted']['ece']:.3f}** |",
-        f"| Brier score (lower is better) | {held_out['heuristic']['brier']:.3f} | "
-        f"**{held_out['fitted']['brier']:.3f}** |",
+        f"| Calibration error on `{train}`, fitted to | {in_sample['heuristic']['ece']:.3f} | "
+        f"{in_sample['fitted']['ece']:.3f} |",
+        f"| Calibration error on `{test}`, held out | {held_out['heuristic']['ece']:.3f} | "
+        f"{held_out['fitted']['ece']:.3f} |",
+        f"| Brier score on `{test}`, held out | {held_out['heuristic']['brier']:.3f} | "
+        f"{held_out['fitted']['brier']:.3f} |",
+        "",
+        "Lower is better for both. " + verdict(held_out),
         "",
         "## Reliability on the held-out dataset",
         "",
