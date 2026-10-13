@@ -4,8 +4,8 @@
 #   docker compose exec api python manage.py create_reviewer acme asha --admin
 #
 # Review app at http://localhost:8080, API docs at http://localhost:8000/api/docs, storage
-# console at http://localhost:9001. Ollama runs on the host (`ollama serve`), where it can use
-# the Mac's GPU; Docker on macOS can't.
+# console at http://localhost:9001, traces at http://localhost:16686. Ollama runs on the host
+# (`ollama serve`), where it can use the Mac's GPU; Docker on macOS can't.
 
 x-app: &app
   build: ./backend
@@ -23,11 +23,15 @@ x-app: &app
     OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
     OCR_MODEL: ${OCR_MODEL:-qwen2.5vl:3b}
     EXTRACTION_MODEL: ${EXTRACTION_MODEL:-qwen2.5:7b}
+    REDIS_URL: redis://redis:6379/0
+    OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
   extra_hosts:
     - "host.docker.internal:host-gateway"
   depends_on:
     migrate:
       condition: service_completed_successfully
+    redis:
+      condition: service_healthy
   restart: unless-stopped
 
 services:
@@ -43,6 +47,21 @@ services:
       test: ["CMD-SHELL", "pg_isready -U docflow"]
       interval: 5s
       retries: 20
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 20
+
+  jaeger:
+    # Traces at http://localhost:16686: each request and pipeline step, SQL and model calls.
+    image: jaegertracing/all-in-one:1.62.0
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"
 
   storage:
     # RustFS: an S3-compatible server (MinIO no longer publishes images). Console on :9001.
