@@ -9,6 +9,11 @@ import { RuleResults } from '../components/RuleResults'
 import { useClaimNext, useDecide, useReviewDocument } from '../hooks/queries'
 import { AMOUNT_FIELDS, FIELD_LABELS, FIELD_ORDER, formatAmount, formatValue } from '../lib/format'
 
+/** "read in 7.2s", or "read from the cache" when the same content was processed before. */
+function timing(step: string, ms: number, cached: boolean): string {
+  return cached ? `${step} from the cache` : `${step} in ${(ms / 1000).toFixed(1)}s`
+}
+
 function asText(value: FieldValue | undefined): string {
   return value === null || value === undefined ? '' : String(value)
 }
@@ -76,7 +81,8 @@ export function ReviewPage() {
                 <summary className="cursor-pointer font-semibold">Text read from the document</summary>
                 <pre className="mt-2 max-h-72 overflow-auto rounded bg-surface-2 p-3 font-mono text-xs whitespace-pre-wrap">{extraction.ocr_text}</pre>
                 <p className="mt-1 text-xs text-muted">
-                  {extraction.pipeline_version} · read in {(extraction.ocr_ms / 1000).toFixed(1)}s, fields in {(extraction.extraction_ms / 1000).toFixed(1)}s
+                  {extraction.pipeline_version} · {timing('read', extraction.ocr_ms, extraction.ocr_cached)},{' '}
+                  {timing('fields', extraction.extraction_ms, extraction.extraction_cached)}
                 </p>
               </details>
             </>

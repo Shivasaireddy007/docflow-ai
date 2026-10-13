@@ -30,6 +30,8 @@ const DOCUMENT = {
     ocr_text: 'SUBTOTAL 194,000\nDISC 19,400\nTOTAL 174,600',
     ocr_ms: 7000,
     extraction_ms: 8000,
+    ocr_cached: true,
+    extraction_cached: false,
     created_at: '2026-10-13T06:00:20Z',
   },
   decisions: [
@@ -78,6 +80,7 @@ describe('ReviewPage', () => {
     expect(screen.getByText('1 of 2 failed', { exact: false })).toBeInTheDocument()
     expect(screen.getByText(/document confidence 0.25/)).toBeInTheDocument()
     expect(screen.getAllByLabelText('Not found in the document text')).toHaveLength(1)
+    expect(screen.getByText(/read from the cache, fields in 8.0s/)).toBeInTheDocument()
   })
 
   it('sends only the fields the reviewer changed', async () => {

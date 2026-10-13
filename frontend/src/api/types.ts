@@ -34,6 +34,8 @@ export type Extraction = {
   ocr_text: string
   ocr_ms: number
   extraction_ms: number
+  ocr_cached: boolean
+  extraction_cached: boolean
   created_at: string
 }
 
