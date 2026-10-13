@@ -76,3 +76,74 @@ resource "aws_cloudwatch_metric_alarm" "model_throttled" {
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.alarms.arn]
 }
+
+resource "aws_cloudwatch_dashboard" "pipeline" {
+  dashboard_name = local.name
+  dashboard_body = jsonencode({
+    widgets = [
+      {
+        type = "metric", x = 0, y = 0, width = 12, height = 6
+        properties = {
+          title  = "Upload to decision, p95 (SLO ${var.document_slo_ms / 1000} s)"
+          region = var.region
+          stat   = "p95"
+          period = 300
+          metrics = [
+            ["AWS/States", "ExecutionTime", "StateMachineArn", aws_sfn_state_machine.pipeline.arn],
+          ]
+          annotations = { horizontal = [{ label = "SLO", value = var.document_slo_ms }] }
+        }
+      },
+      {
+        type = "metric", x = 12, y = 0, width = 12, height = 6
+        properties = {
+          title  = "Documents"
+          region = var.region
+          stat   = "Sum"
+          period = 300
+          metrics = [
+            ["AWS/States", "ExecutionsSucceeded", "StateMachineArn", aws_sfn_state_machine.pipeline.arn],
+            ["AWS/States", "ExecutionsFailed", "StateMachineArn", aws_sfn_state_machine.pipeline.arn],
+            ["AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", aws_sqs_queue.dead_letters.name, { label = "In the dead-letter queue", stat = "Maximum" }],
+          ]
+        }
+      },
+      {
+        type = "metric", x = 0, y = 6, width = 12, height = 6
+        properties = {
+          title   = "Step duration, p95"
+          region  = var.region
+          stat    = "p95"
+          period  = 300
+          metrics = [for k, f in aws_lambda_function.step : ["AWS/Lambda", "Duration", "FunctionName", f.function_name, { label = k }]]
+        }
+      },
+      {
+        type = "metric", x = 12, y = 6, width = 12, height = 6
+        properties = {
+          title  = "Errors and throttles"
+          region = var.region
+          stat   = "Sum"
+          period = 300
+          metrics = concat(
+            [for k, f in aws_lambda_function.step : ["AWS/Lambda", "Errors", "FunctionName", f.function_name, { label = "${k} errors" }]],
+            [for k, f in aws_lambda_function.step : ["AWS/Lambda", "Throttles", "FunctionName", f.function_name, { label = "${k} throttles" }] if local.steps[k].concurrency != null],
+          )
+        }
+      },
+      {
+        type = "metric", x = 0, y = 12, width = 24, height = 6
+        properties = {
+          title  = "Decisions (standalone mode) and confidence, from the decide step's logs"
+          region = var.region
+          period = 300
+          metrics = [
+            ["docflow", "Documents", "Outcome", "auto_approved", { stat = "Sum" }],
+            ["docflow", "Documents", "Outcome", "needs_review", { stat = "Sum" }],
+            ["docflow", "Confidence", "Outcome", "needs_review", { stat = "Average", yAxis = "right" }],
+          ]
+        }
+      },
+    ]
+  })
+}

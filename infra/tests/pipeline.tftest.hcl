@@ -126,6 +126,11 @@ run "deploys_are_canaries_from_main_only" {
   command = apply
 
   assert {
+    condition     = length(jsondecode(aws_cloudwatch_dashboard.pipeline.dashboard_body).widgets) == 5
+    error_message = "The dashboard shows the SLO, documents, step times, errors and decisions."
+  }
+
+  assert {
     condition     = alltrue([for g in aws_codedeploy_deployment_group.step : g.deployment_config_name == "CodeDeployDefault.LambdaCanary10Percent5Minutes" && g.auto_rollback_configuration[0].enabled])
     error_message = "Every step deploys as a canary that rolls back on alarm."
   }
