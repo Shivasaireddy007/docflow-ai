@@ -8,7 +8,7 @@ depth is read from the database at scrape time, so it is right whichever process
 import os
 import re
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 
 from django.http import HttpRequest, HttpResponse
 from prometheus_client import (
@@ -16,11 +16,12 @@ from prometheus_client import (
     REGISTRY,
     CollectorRegistry,
     Counter,
-    Gauge,
     Histogram,
     generate_latest,
     multiprocess,
 )
+from prometheus_client.core import GaugeMetricFamily
+from prometheus_client.registry import Collector
 
 DOCUMENTS = Counter("docflow_documents", "Documents that finished processing, by outcome", ["outcome"])
 STEP_SECONDS = Histogram(
@@ -47,15 +48,30 @@ def _registry() -> CollectorRegistry:
     return REGISTRY
 
 
+class StatusCollector(Collector):
+    """Documents in each status, counted at scrape time. A plain family rather than a Gauge: in
+    multiprocess mode a Gauge is written to a file per process, so every Gunicorn worker that had
+    answered a scrape would report it again and the sum would multiply."""
+
+    def describe(self) -> list[GaugeMetricFamily]:
+        return []  # registering would otherwise run collect(), a query, just to learn the name
+
+    def collect(self) -> Iterator[GaugeMetricFamily]:
+        from django.db.models import Count
+
+        from documents.models import Document
+
+        family = GaugeMetricFamily(
+            "docflow_documents_by_status", "Documents in each status", labels=["status"]
+        )
+        for status, count in Document.objects.values_list("status").annotate(n=Count("id")):
+            family.add_metric([status], count)
+        yield family
+
+
 def metrics_view(request: HttpRequest) -> HttpResponse:
-    from django.db.models import Count
-
-    from documents.models import Document
-
     depth = CollectorRegistry()
-    gauge = Gauge("docflow_documents_by_status", "Documents in each status", ["status"], registry=depth)
-    for status, count in Document.objects.values_list("status").annotate(n=Count("id")):
-        gauge.labels(status).set(count)
+    depth.register(StatusCollector())
     return HttpResponse(
         generate_latest(_registry()) + generate_latest(depth), content_type=CONTENT_TYPE_LATEST
     )
