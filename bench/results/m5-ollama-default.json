@@ -1,0 +1,37 @@
+{
+ "date": "2026-10-13T09:28:02+00:00",
+ "url": "http://127.0.0.1:11434",
+ "model": "qwen2.5vl:3b",
+ "hardware": "Apple M5, 16 GB (Ollama, default settings)",
+ "images": 100,
+ "max_tokens": 1024,
+ "levels": [
+  {
+   "concurrency": 1,
+   "requests": 12,
+   "errors": 1,
+   "pages_per_second": 0.221,
+   "output_tokens_per_second": 15.3,
+   "p50_ms": 5061,
+   "p95_ms": 5559
+  },
+  {
+   "concurrency": 2,
+   "requests": 12,
+   "errors": 1,
+   "pages_per_second": 0.749,
+   "output_tokens_per_second": 48.6,
+   "p50_ms": 2657,
+   "p95_ms": 3062
+  },
+  {
+   "concurrency": 4,
+   "requests": 12,
+   "errors": 1,
+   "pages_per_second": 0.627,
+   "output_tokens_per_second": 40.7,
+   "p50_ms": 5570,
+   "p95_ms": 6982
+  }
+ ]
+}
