@@ -5,20 +5,23 @@ import os
 import shutil
 from typing import Any
 
-from prometheus_client import multiprocess
+# Set here, not in the image: the worker runs from the same image as a single process, without it.
+# It must be set before prometheus_client is imported, which picks its storage at import time.
+METRICS_DIR = os.environ.setdefault(
+    "PROMETHEUS_MULTIPROC_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), ".prometheus")
+)
 
 bind = "0.0.0.0:8000"
 workers = int(os.environ.get("WEB_CONCURRENCY", "3"))
 accesslog = "-"
-METRICS_DIR = os.environ.get("PROMETHEUS_MULTIPROC_DIR")
 
 
 def on_starting(server: Any) -> None:
-    if METRICS_DIR:
-        shutil.rmtree(METRICS_DIR, ignore_errors=True)
-        os.makedirs(METRICS_DIR, exist_ok=True)
+    shutil.rmtree(METRICS_DIR, ignore_errors=True)
+    os.makedirs(METRICS_DIR, exist_ok=True)
 
 
 def child_exit(server: Any, worker: Any) -> None:
-    if METRICS_DIR:
-        multiprocess.mark_process_dead(worker.pid)  # type: ignore[no-untyped-call]
+    from prometheus_client import multiprocess
+
+    multiprocess.mark_process_dead(worker.pid)  # type: ignore[no-untyped-call]

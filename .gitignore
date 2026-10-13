@@ -18,3 +18,4 @@ frontend/playwright-report/
 *.tfstate.*
 *.tfvars
 crash.log
+.prometheus/
