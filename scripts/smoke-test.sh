@@ -21,14 +21,13 @@ echo "== Same file again is deduplicated"
 dup=$(curl -fsS -H "$AUTH" -F "file=@$FILE" "$BASE/api/v1/documents" | jq -r .duplicate)
 [ "$dup" = true ] || fail "duplicate upload created a new document"
 
-echo "== Extraction"
+echo "== Extraction and decision"
 for _ in $(seq 1 60); do
   status=$(curl -fsS -H "$AUTH" "$BASE/api/v1/documents/$id" | jq -r .status)
-  [ "$status" = extracted ] || [ "$status" = failed ] && break
-  sleep 2
+  case "$status" in queued|processing) sleep 2 ;; *) break ;; esac
 done
-[ "$status" = extracted ] || fail "status is $status"
-curl -fsS -H "$AUTH" "$BASE/api/v1/documents/$id" | jq '{status, confidence: .extraction.confidence, total: .extraction.fields.total, pipeline: .extraction.pipeline_version}'
+case "$status" in approved|needs_review) ;; *) fail "status is $status" ;; esac
+curl -fsS -H "$AUTH" "$BASE/api/v1/documents/$id" | jq '{status, confidence: .extraction.confidence, total: .extraction.fields.total, decision: .decision.outcome, rules_version: .decision.rules_version, pipeline: .extraction.pipeline_version}'
 
 echo "== Requests without a key are refused"
 [ "$(curl -s -o /dev/null -w '%{http_code}' "$BASE/api/v1/documents/$id")" = 401 ] || fail "unauthenticated access allowed"
