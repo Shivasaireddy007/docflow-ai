@@ -14,6 +14,8 @@ from documents.storage import get_storage
 from pipeline import run
 from tenants.models import ApiKey, Tenant
 
+pytest_plugins = ["tests.aws_fixtures"]
+
 RECEIPT_TEXT = """KOPI KENANGAN
 12/03/2024
 Es Kopi Susu      2 x 18.000   36.000

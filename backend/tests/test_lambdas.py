@@ -2,64 +2,15 @@
 
 import json
 import time
-from collections.abc import Iterator
 from typing import Any
 
-import boto3
+import httpx
 import pytest
-from moto import mock_aws
 
 from lambdas import aws, handlers
 from pipeline.files import UnsupportedFile
-from tests.conftest import RECEIPT_FIELDS, RECEIPT_TEXT, FakeExtractor, FakeOcr, image_bytes
-
-BUCKET = "docflow-test-documents"
-
-
-@pytest.fixture
-def cloud(monkeypatch: pytest.MonkeyPatch) -> Iterator[dict[str, Any]]:
-    monkeypatch.setenv("AWS_DEFAULT_REGION", "ap-south-1")
-    monkeypatch.setenv("DOCUMENTS_BUCKET", BUCKET)
-    monkeypatch.setenv("RESULTS_TABLE", "docflow-results")
-    monkeypatch.setenv("CACHE_TABLE", "docflow-cache")
-    with mock_aws():
-        aws.s3.cache_clear()
-        aws.dynamodb.cache_clear()
-        s3 = boto3.client("s3")
-        s3.create_bucket(Bucket=BUCKET, CreateBucketConfiguration={"LocationConstraint": "ap-south-1"})
-        s3.put_bucket_versioning(Bucket=BUCKET, VersioningConfiguration={"Status": "Enabled"})
-        db = boto3.client("dynamodb")
-        db.create_table(
-            TableName="docflow-results",
-            BillingMode="PAY_PER_REQUEST",
-            KeySchema=[{"AttributeName": "pk", "KeyType": "HASH"}],
-            AttributeDefinitions=[
-                {"AttributeName": n, "AttributeType": "S"}
-                for n in ("pk", "tenant_id", "status", "uploaded_at")
-            ],
-            GlobalSecondaryIndexes=[
-                {
-                    "IndexName": name,
-                    "KeySchema": [
-                        {"AttributeName": h, "KeyType": "HASH"},
-                        {"AttributeName": "uploaded_at", "KeyType": "RANGE"},
-                    ],
-                    "Projection": {"ProjectionType": "ALL"},
-                }
-                for name, h in (("by_tenant", "tenant_id"), ("by_status", "status"))
-            ],
-        )
-        db.create_table(
-            TableName="docflow-cache",
-            BillingMode="PAY_PER_REQUEST",
-            KeySchema=[{"AttributeName": "key", "KeyType": "HASH"}],
-            AttributeDefinitions=[{"AttributeName": "key", "AttributeType": "S"}],
-        )
-        fakes = {"ocr": FakeOcr(RECEIPT_TEXT), "extract": FakeExtractor(RECEIPT_FIELDS)}
-        monkeypatch.setattr(handlers, "providers", lambda: (fakes["ocr"], fakes["extract"]))
-        yield {"s3": s3, "fakes": fakes}
-    aws.s3.cache_clear()
-    aws.dynamodb.cache_clear()
+from tests.aws_fixtures import BUCKET
+from tests.conftest import RECEIPT_TEXT, image_bytes
 
 
 def run(cloud: dict[str, Any], data: bytes, key: str = "tenants/acme/uploads/lunch.png") -> dict[str, Any]:
@@ -164,3 +115,61 @@ def test_expired_cache_entries_are_misses(cloud: dict[str, Any]) -> None:
     aws.cache_table().put_item(Item={"key": "k", "value": "v", "expires_at": int(time.time()) - 1})
 
     assert store.get("k") is None
+
+
+@pytest.fixture
+def integrated(cloud: dict[str, Any], monkeypatch: pytest.MonkeyPatch) -> list[dict[str, Any]]:
+    """Integrated mode: reports go to a review app, captured here with their signatures checked."""
+    monkeypatch.setenv("CALLBACK_URL", "https://review.example.com/api/v1/internal/pipeline-results")
+    monkeypatch.setenv("CALLBACK_SECRET", "s3cret")
+    received: list[dict[str, Any]] = []
+
+    def fake_post(url: str, content: bytes, headers: dict[str, str], timeout: float) -> httpx.Response:
+        from core import signing
+
+        assert signing.verify(
+            "s3cret", content, headers["X-Docflow-Timestamp"], headers["X-Docflow-Signature"]
+        )
+        received.append(json.loads(content))
+        return httpx.Response(200, json={"status": "auto_approved"})
+
+    monkeypatch.setattr(httpx, "post", fake_post)
+    return received
+
+
+def test_integrated_mode_reports_the_extraction_to_the_review_app(
+    cloud: dict[str, Any], integrated: list[dict[str, Any]]
+) -> None:
+    result = run(cloud, image_bytes())
+
+    assert result["status"] == "reported"
+    [sent] = integrated
+    assert sent["tenant_id"] == "acme" and len(sent["sha256"]) == 64
+    assert sent["result"]["fields"]["total"]["value"] == 56100
+    assert sent["result"]["ocr_text"] == RECEIPT_TEXT
+    assert item(result["pk"])["status"] == "reported"
+
+
+def test_failures_are_reported_and_delivery_errors_retried(
+    cloud: dict[str, Any], integrated: list[dict[str, Any]], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    handlers.report_failure(
+        {"tenant": "acme", "doc_hash": "abc", "error": {"Error": "ModelError", "Cause": "down"}}
+    )
+    assert integrated == [{"tenant_id": "acme", "sha256": "abc", "error": "ModelError: down"}]
+
+    monkeypatch.setattr(httpx, "post", lambda *a, **k: httpx.Response(503, text="deploying"))
+    with pytest.raises(handlers.CallbackError):
+        handlers.report({"tenant_id": "acme", "sha256": "abc", "error": "x"})
+    monkeypatch.setattr(httpx, "post", lambda *a, **k: httpx.Response(404))
+    handlers.report({"tenant_id": "acme", "sha256": "abc", "error": "x"})  # uploaded outside the app: fine
+
+
+def test_force_reprocesses_a_known_file(cloud: dict[str, Any]) -> None:
+    data = image_bytes()
+    run(cloud, data)
+    key = "tenants/acme/uploads/lunch.png"
+
+    again = handlers.prepare({"bucket": BUCKET, "key": key, "force": True})
+
+    assert again["skip"] is False

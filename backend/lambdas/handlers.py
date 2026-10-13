@@ -6,12 +6,18 @@ safe to retry: they read inputs and write outputs at fixed, content-addressed ke
 
 Results live in DynamoDB, one item per document keyed "<tenant>#<sha256>", with indexes for
 listing a tenant's documents by upload time and the review queue by status.
+
+With CALLBACK_URL set (the usual deployment), the pipeline is the processing tier of the review
+app: `decide` sends the scored extraction to the app, signed with the callback secret, and the app
+applies the tenant's rules, queue and audit trail; `report_failure` tells it about failures.
+Without it, `decide` applies rules from config/rules/<tenant>.json itself (standalone mode).
 """
 
 import hashlib
 import json
 import logging
 import os
+import time
 from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
@@ -21,9 +27,11 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
+import httpx  # noqa: E402
 from botocore.exceptions import ClientError  # noqa: E402
 from django.conf import settings  # noqa: E402
 
+from core import signing  # noqa: E402
 from lambdas import aws  # noqa: E402
 from pipeline import confidence, files, schema  # noqa: E402
 from pipeline.cache import ResultCache, sha256  # noqa: E402
@@ -43,8 +51,36 @@ log.setLevel(logging.INFO)
 Event = dict[str, Any]
 
 
+class CallbackError(Exception):
+    """The review app didn't accept a report; Step Functions retries the step."""
+
+
 def providers() -> tuple[OcrProvider, ExtractionProvider]:
     return default_providers()  # replaced in tests
+
+
+def _callback_secret() -> str:
+    if secret := os.environ.get("CALLBACK_SECRET"):
+        return secret
+    value: str = aws.secrets().get_secret_value(SecretId=os.environ["CALLBACK_SECRET_ARN"])["SecretString"]
+    os.environ["CALLBACK_SECRET"] = value  # fetched once per container
+    return value
+
+
+def report(payload: dict[str, Any]) -> None:
+    """Sends a signed report to the review app. A 404 means the document was uploaded straight to
+    S3 rather than through the app, so there is nothing to update there."""
+    body = json.dumps(payload).encode()
+    headers = {"Content-Type": "application/json", **signing.sign(_callback_secret(), body)}
+    try:
+        response = httpx.post(os.environ["CALLBACK_URL"], content=body, headers=headers, timeout=20)
+    except httpx.HTTPError as exc:
+        raise CallbackError(f"Review app unreachable: {exc}") from exc
+    if response.status_code == 404:
+        log.warning("Review app doesn't know %s#%s", payload["tenant_id"], payload["sha256"])
+        return
+    if response.status_code >= 300:
+        raise CallbackError(f"Review app answered {response.status_code}: {response.text[:200]}")
 
 
 def _cache() -> ResultCache:
@@ -91,6 +127,14 @@ def prepare(event: Event, context: object = None) -> Event:
     doc_hash = hashlib.sha256(data).hexdigest()
     out = {"tenant": tenant, "doc_hash": doc_hash, "pk": f"{tenant}#{doc_hash}"}
 
+    claim: dict[str, Any] = {}
+    if not event.get("force"):  # reprocessing a known file skips the dedup condition
+        claim = {
+            # A failed document may be retried; anything else has been (or is being) processed.
+            "ConditionExpression": "attribute_not_exists(pk) OR #s = :failed",
+            "ExpressionAttributeNames": {"#s": "status"},
+            "ExpressionAttributeValues": {":failed": "failed"},
+        }
     try:
         aws.results_table().put_item(
             Item={
@@ -103,10 +147,7 @@ def prepare(event: Event, context: object = None) -> Event:
                 "content_type": content_type,
                 "uploaded_at": _now(),
             },
-            # A failed document may be retried; anything else has been (or is being) processed.
-            ConditionExpression="attribute_not_exists(pk) OR #s = :failed",
-            ExpressionAttributeNames={"#s": "status"},
-            ExpressionAttributeValues={":failed": "failed"},
+            **claim,
         )
     except ClientError as exc:
         if exc.response["Error"]["Code"] != "ConditionalCheckFailedException":
@@ -127,11 +168,13 @@ def ocr(event: Event, context: object = None) -> Event:
     pages = [_get(key) for key in event["pages"]]
     reader, _ = providers()
     cache = _cache()
+    started = time.perf_counter()
     result = cache.get_or_compute(
         cache.key("ocr", event["tenant"], ocr_version(), sha256(*pages)), lambda: reader(pages)
     )
+    ms = round((time.perf_counter() - started) * 1000)
     _put(_work(event, "ocr.txt"), result.value.encode(), "text/plain; charset=utf-8")
-    return {**event, "ocr_key": _work(event, "ocr.txt"), "ocr_cached": result.hit}
+    return {**event, "ocr_key": _work(event, "ocr.txt"), "ocr_cached": result.hit, "ocr_ms": ms}
 
 
 def extract(event: Event, context: object = None) -> Event:
@@ -139,9 +182,12 @@ def extract(event: Event, context: object = None) -> Event:
     _, extractor = providers()
     cache = _cache()
     key = cache.key("extraction", event["tenant"], extraction_version(), sha256(text.encode()))
+    started = time.perf_counter()
     result = cache.get_or_compute(key, lambda: extractor(text))
+    ms = round((time.perf_counter() - started) * 1000)
     _put(_work(event, "fields.json"), json.dumps(result.value).encode(), "application/json")
-    return {**event, "fields_key": _work(event, "fields.json"), "extraction_cached": result.hit}
+    fields_key = _work(event, "fields.json")
+    return {**event, "fields_key": fields_key, "extraction_cached": result.hit, "extraction_ms": ms}
 
 
 def _tenant_rules(tenant: str) -> tuple[list[dict[str, Any]], str]:
@@ -178,6 +224,8 @@ def decide(event: Event, context: object = None) -> Event:
     text = _get(event["ocr_key"]).decode()
     receipt = schema.coerce(json.loads(_get(event["fields_key"])))
     fields, items, document_confidence = confidence.score(receipt, text)
+    if os.environ.get("CALLBACK_URL"):
+        return _report_to_app(event, text, fields, items, document_confidence)
     rule_list, rules_version = _tenant_rules(event["tenant"])
 
     fingerprint = rules.fingerprint(fields)
@@ -231,3 +279,49 @@ def decide(event: Event, context: object = None) -> Event:
     emf = {"Timestamp": int(datetime.now(UTC).timestamp() * 1000), "CloudWatchMetrics": [metric_definition]}
     print(json.dumps({"_aws": emf, "Outcome": outcome, "Documents": 1, "Confidence": document_confidence}))
     return {"pk": event["pk"], "status": outcome, "confidence": document_confidence}
+
+
+def _report_to_app(
+    event: Event, text: str, fields: dict[str, Any], items: list[dict[str, Any]], document_confidence: float
+) -> Event:
+    """Integrated mode: the review app applies the rules; this reports the extraction and records it."""
+    report(
+        {
+            "tenant_id": event["tenant"],
+            "sha256": event["doc_hash"],
+            "execution": event.get("execution", ""),
+            "result": {
+                "pipeline_version": pipeline_version(),
+                "ocr_text": text,
+                "fields": fields,
+                "line_items": items,
+                "confidence": document_confidence,
+                "ocr_ms": event.get("ocr_ms", 0),
+                "extraction_ms": event.get("extraction_ms", 0),
+                "ocr_cached": event.get("ocr_cached", False),
+                "extraction_cached": event.get("extraction_cached", False),
+            },
+        }
+    )
+    values = {"status": "reported", "confidence": document_confidence, "pipeline_version": pipeline_version()}
+    aws.results_table().update_item(
+        Key={"pk": event["pk"]},
+        UpdateExpression="SET " + ", ".join(f"#{name} = :{name}" for name in values),
+        ExpressionAttributeNames={f"#{name}": name for name in values},
+        ExpressionAttributeValues=_dynamo({f":{name}": value for name, value in values.items()}),
+    )
+    return {"pk": event["pk"], "status": "reported", "confidence": document_confidence}
+
+
+def report_failure(event: Event, context: object = None) -> Event:
+    """Failure path: tells the review app the document failed, so it isn't left waiting."""
+    if os.environ.get("CALLBACK_URL") and "tenant" in event and "doc_hash" in event:
+        error = event.get("error") or {}
+        report(
+            {
+                "tenant_id": event["tenant"],
+                "sha256": event["doc_hash"],
+                "error": f"{error.get('Error', 'Failed')}: {str(error.get('Cause', ''))[:500]}",
+            }
+        )
+    return event

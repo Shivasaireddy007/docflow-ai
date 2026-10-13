@@ -18,6 +18,11 @@ def dynamodb() -> Any:
     return boto3.resource("dynamodb")
 
 
+@cache
+def secrets() -> Any:
+    return boto3.client("secretsmanager")
+
+
 def bucket() -> str:
     return os.environ["DOCUMENTS_BUCKET"]
 
