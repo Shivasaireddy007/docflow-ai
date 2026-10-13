@@ -1,6 +1,7 @@
 # docflow-ai
 
 [![CI](https://github.com/Shivasaireddy007/docflow-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/Shivasaireddy007/docflow-ai/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Shivasaireddy007/docflow-ai)](https://github.com/Shivasaireddy007/docflow-ai/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 ![Python](https://img.shields.io/badge/Python_3.12-3776AB?logo=python&logoColor=white)
@@ -20,6 +21,10 @@ person corrects and decides, with every step in an append-only audit trail.
 **On the 100 labelled receipts of the CORD test set: 52% approved automatically with no wrong
 total among them, and every one of the 14 wrong totals sent to a person**
 ([evaluation](docs/evaluation/README.md)).
+
+![A reviewer corrects a total the model got wrong: it took the subtotal, and the arithmetic check flagged it](docs/media/review.gif)
+
+[![Watch the 40-second walkthrough](docs/media/walkthrough-poster.png)](docs/media/walkthrough.mp4)
 
 ![Reviewing a receipt: the model swapped subtotal and total, and the arithmetic check flags both](docs/images/review.png)
 
