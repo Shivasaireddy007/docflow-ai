@@ -60,16 +60,19 @@ def to_amount(value: object) -> float | None:
         return float(value)
     if not isinstance(value, str):
         return None
-    text = re.sub(r"[^\d.,\s-]", "", value).strip()
+    # Receipts print negatives as -19.400 or (19,400); read the sign, then the number.
+    negative = "-" in value or bool(re.search(r"\(\s*[\d.,\s]+\)", value))
+    text = re.sub(r"[^\d.,\s]", "", value).strip()
     if not text:
         return None
     if _THOUSANDS.match(text):  # 12.500 / 12,500 / 1 250 000: separators, not decimals
-        return float(re.sub(r"[.,\s]", "", text))
-    text = text.replace(" ", "").replace(",", ".")
-    try:
-        return float(text)
-    except ValueError:
-        return None
+        number = float(re.sub(r"[.,\s]", "", text))
+    else:
+        try:
+            number = float(text.replace(" ", "").replace(",", "."))
+        except ValueError:
+            return None
+    return -number if negative else number
 
 
 _DATE_FORMATS = [
@@ -114,6 +117,8 @@ def coerce(raw: dict[str, Any]) -> Receipt:
     fields["receipt_date"] = to_date(raw.get("receipt_date"))
     for name in AMOUNT_FIELDS:
         fields[name] = to_amount(raw.get(name))
+    if isinstance(fields["discount"], float):
+        fields["discount"] = abs(fields["discount"])  # printed as -19.400; it is subtracted either way
 
     items: list[dict[str, Value]] = []
     raw_items = raw.get("line_items")

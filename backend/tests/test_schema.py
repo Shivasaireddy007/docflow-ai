@@ -13,6 +13,9 @@ from pipeline.schema import coerce, to_amount, to_date
         ("1 250 000", 1250000.0),
         ("12.50", 12.5),
         ("12,5", 12.5),
+        ("-19.400", -19400.0),
+        ("(19,400)", -19400.0),
+        ("-12.50", -12.5),
         ("", None),
         ("n/a", None),
         (True, None),
@@ -47,3 +50,7 @@ def test_garbage_from_the_model_becomes_missing_values_not_errors() -> None:
     assert receipt.line_items == [
         {"description": None, "quantity": None, "unit_price": None, "amount": 5000.0}
     ]
+
+
+def test_a_discount_printed_as_negative_is_stored_as_an_amount_off() -> None:
+    assert coerce({"discount": "-19.400"}).fields["discount"] == 19400.0
