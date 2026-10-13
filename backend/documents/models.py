@@ -13,7 +13,9 @@ class Document(models.Model):
     class Status(models.TextChoices):
         QUEUED = "queued"
         PROCESSING = "processing"
-        EXTRACTED = "extracted"
+        NEEDS_REVIEW = "needs_review"
+        APPROVED = "approved"
+        REJECTED = "rejected"
         FAILED = "failed"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -26,6 +28,11 @@ class Document(models.Model):
     storage_key = models.CharField(max_length=512)
     status = models.CharField(max_length=16, choices=Status.choices, default=Status.QUEUED)
     error = models.TextField(blank=True)
+    # A reviewer's lease on the document, so two people never review the same one.
+    claimed_by = models.ForeignKey(
+        "auth.User", null=True, blank=True, on_delete=models.SET_NULL, related_name="claimed_documents"
+    )
+    claim_expires_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

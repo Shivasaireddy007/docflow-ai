@@ -23,7 +23,7 @@ def test_a_job_extracts_the_document(api: APIClient, models: Models) -> None:
     assert jobs.run_once() is True
 
     document.refresh_from_db()
-    assert document.status == Document.Status.EXTRACTED
+    assert document.status == Document.Status.APPROVED, "every default rule passes"
     assert document.jobs.get().status == Job.Status.SUCCEEDED
     extraction = document.extractions.get()
     assert extraction.fields["total"]["checks"] == {"grounded": True, "valid": True, "consistent": True}
