@@ -8,7 +8,8 @@ A key is (tenant, step version, SHA-256 of exactly what the model sees):
 So the same content is never sent to a model twice; changing a model or a prompt changes the
 version part and invalidates exactly the results that step produced (a new extraction prompt
 re-runs extraction but reuses the OCR). Keys are per tenant, so one tenant can't learn from
-timing what another has uploaded. If Redis is down, results are computed as if uncached.
+timing what another has uploaded. The store is Redis locally and DynamoDB on AWS; if it is down,
+results are computed as if uncached.
 """
 
 import hashlib
@@ -16,11 +17,10 @@ import json
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, TypeVar
+from typing import Any, Protocol, TypeVar
 
 from django.conf import settings
 from redis import Redis
-from redis.exceptions import RedisError
 
 from core.redis import get_redis
 
@@ -41,9 +41,28 @@ class Cached:
     hit: bool
 
 
-class ResultCache:
-    def __init__(self, redis: Redis | None, ttl_seconds: int) -> None:
+class Store(Protocol):
+    """Raises an exception when unavailable; ResultCache then carries on uncached."""
+
+    def get(self, key: str) -> str | None: ...
+    def set(self, key: str, value: str, ttl_seconds: int) -> None: ...
+
+
+class RedisStore:
+    def __init__(self, redis: Redis) -> None:
         self.redis = redis
+
+    def get(self, key: str) -> str | None:
+        value = self.redis.get(key)
+        return value.decode() if isinstance(value, bytes) else None
+
+    def set(self, key: str, value: str, ttl_seconds: int) -> None:
+        self.redis.set(key, value, ex=ttl_seconds)
+
+
+class ResultCache:
+    def __init__(self, store: Store | None, ttl_seconds: int) -> None:
+        self.store = store
         self.ttl = ttl_seconds
 
     @staticmethod
@@ -52,20 +71,21 @@ class ResultCache:
         return f"docflow:{step}:{tenant_id}:{version_hash}:{content_hash}"
 
     def get_or_compute(self, key: str, compute: Callable[[], T]) -> Cached:
-        if self.redis is not None:
+        if self.store is not None:
             try:
-                if (stored := self.redis.get(key)) is not None:
+                if (stored := self.store.get(key)) is not None:
                     return Cached(json.loads(stored), hit=True)
-            except RedisError:
+            except Exception:
                 log.warning("Result cache unavailable; computing %s", key, exc_info=True)
         value = compute()
-        if self.redis is not None:
+        if self.store is not None:
             try:
-                self.redis.set(key, json.dumps(value), ex=self.ttl)
-            except RedisError:
+                self.store.set(key, json.dumps(value), self.ttl)
+            except Exception:
                 log.warning("Could not store %s in the result cache", key, exc_info=True)
         return Cached(value, hit=False)
 
 
 def get_result_cache() -> ResultCache:
-    return ResultCache(get_redis() if settings.RESULT_CACHE_ENABLED else None, settings.RESULT_CACHE_SECONDS)
+    store = RedisStore(get_redis()) if settings.RESULT_CACHE_ENABLED else None
+    return ResultCache(store, settings.RESULT_CACHE_SECONDS)

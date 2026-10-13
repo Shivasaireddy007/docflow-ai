@@ -10,7 +10,7 @@ from rest_framework.test import APIClient
 from documents import jobs
 from documents.models import Document, Extraction
 from pipeline import run
-from pipeline.cache import ResultCache
+from pipeline.cache import RedisStore, ResultCache
 from tenants.models import Tenant
 from tests.conftest import Models, client_for, image_bytes, upload
 
@@ -80,7 +80,7 @@ def test_tenants_never_share_cached_results(api: APIClient, models: Models, db: 
 
 def test_without_redis_results_are_computed() -> None:
     down = Redis(port=1, socket_connect_timeout=0.1, retry=Retry(NoBackoff(), 0))
-    cache = ResultCache(down, ttl_seconds=60)
+    cache = ResultCache(RedisStore(down), ttl_seconds=60)
     calls: list[int] = []
 
     def compute() -> dict[str, int]:
