@@ -9,3 +9,7 @@ staticfiles/
 .ruff_cache/
 .DS_Store
 data/
+node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/

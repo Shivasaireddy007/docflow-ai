@@ -1,0 +1,42 @@
+@import 'tailwindcss';
+
+/* An operations tool: calm neutrals with a slight cool bias, one teal accent, and status colours
+   kept separate from it. Plex reads well at small sizes and its mono face suits extracted values. */
+@theme {
+  --color-board: #eef1f3;
+  --color-surface: #ffffff;
+  --color-surface-2: #f5f7f8;
+  --color-ink: #121a21;
+  --color-muted: #586572;
+  --color-line: #d8dee3;
+  --color-brand: #0e5c56;
+  --color-brand-dark: #0a4642;
+  --color-brand-soft: #dcefec;
+  --color-good: #17784c;
+  --color-good-soft: #ddf3e8;
+  --color-warn: #8f5600;
+  --color-warn-soft: #fcecd2;
+  --color-crit: #b42626;
+  --color-crit-soft: #fbe1e1;
+
+  --font-sans: 'IBM Plex Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-board font-sans text-ink antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand;
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
