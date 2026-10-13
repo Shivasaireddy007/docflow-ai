@@ -1,8 +1,9 @@
-"""OCR and field extraction with self-hosted models served by Ollama.
+"""OCR and field extraction with self-hosted models.
 
-Both steps call the same chat endpoint with temperature 0 and a fixed seed, so a document
-processed twice by the same pipeline version gives the same result. Extraction is constrained
-to the receipt JSON schema, so the model can't return free text.
+Two ways to reach a model server, chosen with MODEL_API: Ollama's own API (local development)
+or the OpenAI-compatible API that vLLM serves (GPU deployments; Ollama speaks it too). Both use
+temperature 0 and a fixed seed, so a document processed twice by the same pipeline version gives
+the same result, and extraction is constrained to the receipt JSON schema.
 """
 
 import base64
@@ -49,7 +50,21 @@ class ExtractionProvider(Protocol):
     def __call__(self, text: str) -> dict[str, Any]: ...
 
 
+class ChatClient(Protocol):
+    def chat(
+        self,
+        model: str,
+        prompt: str,
+        *,
+        max_tokens: int,
+        images: list[bytes] | None = None,
+        schema: dict[str, Any] | None = None,
+    ) -> str: ...
+
+
 class OllamaClient:
+    """Ollama's native /api/chat."""
+
     def __init__(
         self,
         base_url: str,
@@ -94,8 +109,59 @@ class OllamaClient:
         return str(content)
 
 
-class OllamaOcr:
-    def __init__(self, client: OllamaClient, model: str) -> None:
+class OpenAIClient:
+    """The OpenAI-compatible /v1/chat/completions served by vLLM (and Ollama, and others)."""
+
+    def __init__(
+        self,
+        base_url: str,
+        timeout: float,
+        api_key: str = "",
+        transport: httpx.BaseTransport | None = None,
+        before_call: Callable[[str], None] | None = None,
+    ) -> None:
+        headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
+        self._http = httpx.Client(base_url=base_url, timeout=timeout, transport=transport, headers=headers)
+        self._before_call = before_call
+
+    def chat(
+        self,
+        model: str,
+        prompt: str,
+        *,
+        max_tokens: int,
+        images: list[bytes] | None = None,
+        schema: dict[str, Any] | None = None,
+    ) -> str:
+        content: list[dict[str, Any]] = [{"type": "text", "text": prompt}]
+        for image in images or []:
+            url = "data:image/png;base64," + base64.b64encode(image).decode()
+            content.append({"type": "image_url", "image_url": {"url": url}})
+        body: dict[str, Any] = {
+            "model": model,
+            "messages": [{"role": "user", "content": content}],
+            "temperature": 0,
+            "seed": 7,
+            "max_tokens": max_tokens,
+        }
+        if schema is not None:
+            body["response_format"] = {
+                "type": "json_schema",
+                "json_schema": {"name": "receipt", "schema": schema, "strict": True},
+            }
+        if self._before_call is not None:
+            self._before_call(model)
+        try:
+            response = self._http.post("/v1/chat/completions", json=body)
+            response.raise_for_status()
+            text = response.json()["choices"][0]["message"]["content"]
+        except (httpx.HTTPError, KeyError, IndexError, ValueError) as exc:
+            raise ModelError(f"{model} failed: {exc}") from exc
+        return str(text)
+
+
+class Ocr:
+    def __init__(self, client: ChatClient, model: str) -> None:
         self.client = client
         self.model = model
 
@@ -107,8 +173,8 @@ class OllamaOcr:
         return "\n\n".join(texts)
 
 
-class OllamaExtractor:
-    def __init__(self, client: OllamaClient, model: str) -> None:
+class Extractor:
+    def __init__(self, client: ChatClient, model: str) -> None:
         self.client = client
         self.model = model
 
@@ -150,6 +216,17 @@ def _rate_limited(model: str) -> None:
         raise ModelBusy(f"{model} is at its request limit")
 
 
+def make_client(before_call: Callable[[str], None] | None = _rate_limited) -> ChatClient:
+    if settings.MODEL_API == "openai":
+        return OpenAIClient(
+            settings.MODEL_URL,
+            settings.MODEL_TIMEOUT_SECONDS,
+            settings.MODEL_API_KEY,
+            before_call=before_call,
+        )
+    return OllamaClient(settings.MODEL_URL, settings.MODEL_TIMEOUT_SECONDS, before_call=before_call)
+
+
 def default_providers() -> tuple[OcrProvider, ExtractionProvider]:
-    client = OllamaClient(settings.OLLAMA_URL, settings.MODEL_TIMEOUT_SECONDS, before_call=_rate_limited)
-    return OllamaOcr(client, settings.OCR_MODEL), OllamaExtractor(client, settings.EXTRACTION_MODEL)
+    client = make_client()
+    return Ocr(client, settings.OCR_MODEL), Extractor(client, settings.EXTRACTION_MODEL)

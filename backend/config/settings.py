@@ -143,7 +143,10 @@ S3_BUCKET = env("S3_BUCKET", "docflow-documents")
 S3_ENDPOINT_URL = env("S3_ENDPOINT_URL") or None  # RustFS locally; empty for AWS
 
 # Models, served by Ollama locally and vLLM for the GPU benchmark.
-OLLAMA_URL = env("OLLAMA_URL", "http://127.0.0.1:11434")
+# "ollama" (Ollama's own API) or "openai" (the OpenAI-compatible API that vLLM serves).
+MODEL_API = env("MODEL_API", "ollama")
+MODEL_URL = env("MODEL_URL") or env("OLLAMA_URL", "http://127.0.0.1:11434")
+MODEL_API_KEY = env("MODEL_API_KEY")
 OCR_MODEL = env("OCR_MODEL", "qwen2.5vl:3b")
 EXTRACTION_MODEL = env("EXTRACTION_MODEL", "qwen2.5:7b")
 MODEL_TIMEOUT_SECONDS = float(env("MODEL_TIMEOUT_SECONDS", "180"))

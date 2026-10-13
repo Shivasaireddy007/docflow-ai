@@ -9,7 +9,7 @@ services:
 
   api:
     environment:
-      OLLAMA_URL: http://ollama-stub:11434
+      MODEL_URL: http://ollama-stub:11434
   worker:
     environment:
-      OLLAMA_URL: http://ollama-stub:11434
+      MODEL_URL: http://ollama-stub:11434

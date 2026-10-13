@@ -5,7 +5,7 @@ from typing import Any
 import httpx
 import pytest
 
-from pipeline.providers import ModelError, OllamaClient, OllamaExtractor, OllamaOcr
+from pipeline.providers import Extractor, ModelError, Ocr, OllamaClient, OpenAIClient
 from pipeline.schema import JSON_SCHEMA
 
 
@@ -29,7 +29,7 @@ def reply(content: str) -> httpx.Response:
 def test_ocr_sends_each_page_as_an_image_deterministically() -> None:
     server = FakeOllama([reply("page one"), reply("page two")])
 
-    text = OllamaOcr(server.client(), "qwen2.5vl:3b")([b"png-1", b"png-2"])
+    text = Ocr(server.client(), "qwen2.5vl:3b")([b"png-1", b"png-2"])
 
     assert text == "page one\n\npage two"
     first = server.requests[0]
@@ -43,7 +43,7 @@ def test_ocr_sends_each_page_as_an_image_deterministically() -> None:
 def test_extraction_is_constrained_to_the_schema() -> None:
     server = FakeOllama([reply('{"total": 56100}')])
 
-    result = OllamaExtractor(server.client(), "qwen2.5:7b")("TOTAL 56.100")
+    result = Extractor(server.client(), "qwen2.5:7b")("TOTAL 56.100")
 
     assert result == {"total": 56100}
     assert server.requests[0]["format"] == JSON_SCHEMA
@@ -63,4 +63,39 @@ def test_server_failures_and_bad_output_raise_a_retryable_error(response: httpx.
     server = FakeOllama([response])
 
     with pytest.raises(ModelError):
-        OllamaExtractor(server.client(), "qwen2.5:7b")("text")
+        Extractor(server.client(), "qwen2.5:7b")("text")
+
+
+class FakeOpenAI(FakeOllama):
+    def client(self) -> OpenAIClient:  # type: ignore[override]
+        return OpenAIClient("http://vllm", 5, api_key="k", transport=httpx.MockTransport(self.handle))
+
+
+def completion(content: str) -> httpx.Response:
+    return httpx.Response(200, json={"choices": [{"message": {"role": "assistant", "content": content}}]})
+
+
+def test_the_openai_api_sends_images_as_data_urls() -> None:
+    server = FakeOpenAI([completion("TOTAL 56.100")])
+
+    text = Ocr(server.client(), "dots.ocr")([b"png"])
+
+    message = server.requests[0]["messages"][0]["content"]
+    assert text == "TOTAL 56.100"
+    assert message[1] == {
+        "type": "image_url",
+        "image_url": {"url": "data:image/png;base64," + base64.b64encode(b"png").decode()},
+    }
+    assert (server.requests[0]["temperature"], server.requests[0]["max_tokens"]) == (0, 2048)
+
+
+def test_the_openai_api_constrains_extraction_with_json_schema() -> None:
+    server = FakeOpenAI([completion('{"total": 56100}')])
+
+    assert Extractor(server.client(), "qwen2.5-7b")("TOTAL 56.100") == {"total": 56100}
+    assert server.requests[0]["response_format"]["json_schema"]["schema"] == JSON_SCHEMA
+
+
+def test_openai_api_failures_are_retryable() -> None:
+    with pytest.raises(ModelError):
+        Extractor(FakeOpenAI([httpx.Response(200, json={"choices": []})]).client(), "m")("text")
