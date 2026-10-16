@@ -1,14 +1,30 @@
 # Evaluation
 
-The pipeline is measured on the 100 labelled receipts of the
-[CORD](https://huggingface.co/datasets/naver-clova-ix/cord-v2) test set: real photos of Indonesian
-receipts, crumpled and shadowed, with the store details blurred by the dataset. Every run goes
-through the production code (pages, OCR, extraction, confidence checks, default rules) and is
-compared field by field with the labels:
+The pipeline is measured on two labelled public datasets with different conventions:
+
+- [CORD](https://huggingface.co/datasets/naver-clova-ix/cord-v2): 100 test receipts, real photos
+  of Indonesian receipts, crumpled and shadowed, store details blurred. Rupiah, no decimals
+  (`56.100` is fifty-six thousand). Labels for every amount and line item.
+- [SROIE](https://huggingface.co/datasets/jsdnrs/ICDAR2019-SROIE): 100 test receipts, scanned
+  Malaysian receipts. Ringgit with two decimals (`38.90`). Labels for merchant, date and total.
+
+Every run goes through the production code (pages, OCR, extraction, confidence checks, default
+rules) and is compared field by field with the labels:
 
 ```bash
-cd backend && uv run python -m evaluation.run --limit 100 --out ../docs/evaluation/<name>
+cd backend && uv run python -m evaluation.run --dataset cord|sroie --limit 100 --out ../docs/evaluation/<name>
 ```
+
+## Current results (prompt 3)
+
+| Judged on the total | [CORD](prompt-3/README.md) | [SROIE](sroie-prompt-3/README.md) |
+|---|---|---|
+| Totals extracted correctly (recall) | 82% | **96%** |
+| Approved automatically | 53% | 52% |
+| Wrong totals among the auto-approved | **0** | **0** |
+| Wrong totals sent to a person instead | 16 of 16 | 4 of 4 |
+
+Across both datasets: 100 of 191 receipts approved automatically (52%), none with a wrong total.
 
 Models: `qwen2.5vl:3b` (OCR) and `qwen2.5:7b` (fields) through Ollama, on an Apple M5 laptop.
 
@@ -32,13 +48,35 @@ charges (9 → 6 of 12 correct); totals matter most, so it is the default. Re-ru
 for prompt 2 re-ran only extraction: the OCR came from the cache, because the cache key includes
 each step's version and the OCR step hadn't changed.
 
+## Prompt 2 → prompt 3: a second dataset finds what the first can't
+
+On SROIE, [prompt 2](sroie/README.md) got only 49% of totals right: it read the decimal point in
+`38.90` as a thousands separator and returned 3890. CORD, printed without decimals, could never
+have shown this. The safety net held (the value isn't on the page, so all 51 wrong totals went to
+a person), but it cost automation. Prompt 3 says how to tell the two separators apart (three
+digits after it group thousands; one or two are decimals): SROIE totals went from 49% to 96%
+correct, and CORD stayed the same within noise (77 → 75 of 91).
+
+The same run exposed a bug outside the prompt. Correct totals like 193 were marked "not on the
+page" because the receipt prints `RM193.00`, and the grounding check didn't try whole amounts
+with zero cents. After the fix, the saved results were scored again with `--rescore` (model output
+from the cache, model times kept): SROIE auto-approval rose from 13% to 52%, still with no wrong
+totals.
+
+## Calibration: fitted weights didn't generalise
+
+The confidence score comes from hand-set penalties on the three checks. A
+[logistic regression](calibration/README.md) fitted to the same checks on CORD was better
+calibrated on CORD (expected calibration error 0.060 → 0.013) but worse on SROIE, which it never
+saw (0.043 → 0.107). The hand-set penalties generalise better, so the pipeline keeps them.
+
 ## What the numbers say
 
-- **The checks are what makes automation safe.** The models alone get about one total in six
-  wrong; none of those were approved automatically in either run, because a wrong total is either
+- **The checks are what makes automation safe.** The models alone get up to half the totals
+  wrong (SROIE, prompt 2); none of those were ever approved automatically, because a wrong total is either
   missing from the OCR text or breaks the receipt's arithmetic.
-- **The threshold is set from data.** With prompt 2, approving at confidence 0.5 would let 2 wrong
-  totals through; from 0.6 up there are none. The default, 0.9, keeps a margin.
+- **The threshold is set from data.** At confidence 0.5, wrong totals get approved on both
+  datasets (2 on CORD, 1 on SROIE with prompt 3); from 0.6 up there are none. The default, 0.9, keeps a margin.
 - **Where it still fails:** receipts where OCR loses the layout (labels and amounts in separate
   columns), and totals that are blurred or cut off. Those go to a person, which is the design.
 
