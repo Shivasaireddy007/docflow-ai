@@ -1,0 +1,15 @@
+# For images built from the repository root (deploy/render/Dockerfile).
+**/node_modules
+**/.venv
+**/__pycache__
+**/.*_cache
+frontend/dist
+frontend/test-results
+backend/.storage
+backend/.prometheus
+backend/staticfiles
+backend/tests
+data
+bench
+infra
+.git
