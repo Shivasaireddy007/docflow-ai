@@ -17,9 +17,9 @@ export const FIELD_ORDER = Object.keys(FIELD_LABELS)
 
 export const AMOUNT_FIELDS = new Set(['subtotal', 'tax', 'service_charge', 'discount', 'total', 'cash_paid', 'change'])
 
-const number = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 })
+const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 })
 
-/** 174600 -> "1,74,600" (amounts are shown without a currency the receipt may not state). */
+/** 174600 -> "174,600": thousands grouping reads the same for any currency, and receipts don't always state one. */
 export function formatAmount(value: number | null | undefined): string {
   return value === null || value === undefined ? '–' : number.format(value)
 }

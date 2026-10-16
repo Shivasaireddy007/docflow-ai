@@ -4,7 +4,7 @@ import { confidenceTone, describeRule, formatAmount, formatValue, timeAgo } from
 
 describe('format', () => {
   it('groups amounts the Indian way and leaves text alone', () => {
-    expect(formatAmount(174600)).toBe('1,74,600')
+    expect(formatAmount(174600)).toBe('174,600')
     expect(formatAmount(null)).toBe('–')
     expect(formatValue('total', 56100)).toBe('56,100')
     expect(formatValue('merchant_name', 'Kopi Kenangan')).toBe('Kopi Kenangan')
@@ -15,7 +15,7 @@ describe('format', () => {
   })
 
   it('describes rules as sentences', () => {
-    expect(describeRule({ id: 'a', type: 'max_amount', field: 'total', max: 1000000 })).toBe('Total is at most 10,00,000')
+    expect(describeRule({ id: 'a', type: 'max_amount', field: 'total', max: 1000000 })).toBe('Total is at most 1,000,000')
     expect(describeRule({ id: 'b', type: 'min_confidence', min: 0.9 })).toBe('Confidence is at least 0.90')
     expect(describeRule({ id: 'c', type: 'unique_receipt' })).toBe('Not a duplicate of an approved receipt')
   })

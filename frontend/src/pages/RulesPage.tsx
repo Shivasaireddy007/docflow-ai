@@ -73,7 +73,7 @@ export function RulesPage() {
             </p>
             <label className="grid gap-1 text-sm">
               <span className="font-semibold">What changed?</span>
-              <input value={note} onChange={(e) => setNote(e.target.value)} className="rounded-md border border-line px-2.5 py-1.5" placeholder="For example: raise the amount limit to 2,00,000" />
+              <input value={note} onChange={(e) => setNote(e.target.value)} className="rounded-md border border-line px-2.5 py-1.5" placeholder="For example: raise the amount limit to 2,000,000" />
             </label>
             {parseError || publish.isError ? (
               <p role="alert" className="rounded-md bg-crit-soft p-3 text-sm text-crit">
