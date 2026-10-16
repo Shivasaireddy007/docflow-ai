@@ -1,0 +1,35 @@
+name: Bug report
+description: Something doesn't work, or a field was extracted or scored wrongly
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Upload ...
+        2. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v1.1.0, or a commit hash
+  - type: input
+    id: pipeline
+    attributes:
+      label: Pipeline version (for extraction problems)
+      description: Shown on the document, e.g. ocr=qwen2.5vl:3b;llm=qwen2.5:7b;prompt=3
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      render: shell
