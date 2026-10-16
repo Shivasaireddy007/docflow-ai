@@ -143,3 +143,42 @@ jobs:
       - name: Logs on failure
         if: failure()
         run: docker compose -f docker-compose.yml -f docker-compose.ci.yml logs --tail=80
+
+  demo:
+    # The public demo image (deploy/render): the app and API on one origin, read-only, with the
+    # reviewed receipts loaded at start.
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: docflow
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and start the demo
+        run: |
+          docker build -f deploy/render/Dockerfile -t docflow-demo .
+          docker run -d --name demo --network host -e PORT=10000 -e SECRET_KEY=ci -e SECURE_COOKIES=false \
+            -e DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/docflow docflow-demo
+          for i in $(seq 1 60); do curl -fsS http://localhost:10000/ready > /dev/null 2>&1 && break; sleep 2; done
+      - name: The app, its routes and the read-only API
+        run: |
+          base=http://localhost:10000
+          curl -fsS $base/ | grep -q '<div id="root">'
+          curl -fsS $base/review/any-document | grep -q '<div id="root">'
+          curl -fsS -c jar $base/api/v1/auth/csrf > /dev/null
+          token=$(awk '$6 == "csrftoken" {print $7}' jar)
+          curl -fsS -b jar -c jar -H "X-CSRFToken: $token" -H 'Content-Type: application/json' \
+            -d '{"username": "demo", "password": "demo-password"}' $base/api/v1/auth/login > /dev/null
+          token=$(awk '$6 == "csrftoken" {print $7}' jar)
+          curl -fsS -b jar "$base/api/v1/documents" | jq -e '.count >= 10'
+          status=$(curl -s -o /dev/null -w '%{http_code}' -b jar -H "X-CSRFToken: $token" \
+            -F file=@e2e/receipt.png $base/api/v1/documents)
+          test "$status" = 403
+      - name: Logs on failure
+        if: failure()
+        run: docker logs demo --tail 80
