@@ -300,6 +300,11 @@ CI runs five jobs on every push:
 - **demo:** the public demo image built and started, its pages served, the demo sign-in working
   and uploads refused.
 
+## Contributing
+
+Issues and pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). Changes are listed in
+the [CHANGELOG](CHANGELOG.md), and security problems go through [SECURITY.md](SECURITY.md).
+
 ## License
 
 [MIT](LICENSE)
