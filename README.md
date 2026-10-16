@@ -3,6 +3,7 @@
 [![CI](https://github.com/Shivasaireddy007/docflow-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/Shivasaireddy007/docflow-ai/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/Shivasaireddy007/docflow-ai)](https://github.com/Shivasaireddy007/docflow-ai/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Live demo](https://img.shields.io/badge/demo-live-2ea44f)](https://docflow-demo.onrender.com)
 
 ![Python](https://img.shields.io/badge/Python_3.12-3776AB?logo=python&logoColor=white)
 ![Django](https://img.shields.io/badge/Django_REST-092E20?logo=django&logoColor=white)
@@ -17,6 +18,9 @@ A document-intelligence pipeline for receipts and invoices: upload a document, a
 models read it (OCR), extract its fields, and score each field's confidence with checks you can
 verify. Versioned rules approve what they can; everything else goes to a review queue where a
 person corrects and decides, with every step in an append-only audit trail.
+
+**[Try the live demo](https://docflow-demo.onrender.com)**: review real receipts the models have
+read, as a reviewer would (the sign-in is filled in; the first visit may take a minute to wake it).
 
 **On 191 labelled receipts from two public datasets: 52% approved automatically with no wrong
 total among them, and every wrong total sent to a person**
@@ -207,7 +211,7 @@ its result into the Django endpoint end to end.
 
 ## Public demo
 
-A read-only copy with 15 receipts from both datasets, read by the real models ahead of time:
+**[docflow-demo.onrender.com](https://docflow-demo.onrender.com)**: a read-only copy with 15 receipts from both datasets, read by the real models ahead of time:
 approve, correct or reject them as a reviewer would (the sign-in is filled in). Uploads are off,
 since the free host has no GPU for the models. It runs on Render's free plan from
 [`render.yaml`](render.yaml): one container serving the API and the review app, with its own
