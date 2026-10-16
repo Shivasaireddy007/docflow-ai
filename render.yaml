@@ -1,5 +1,5 @@
-# The public demo on Render's free plan: one web service, Postgres, and Key Value (Redis) for
-# rate limits and the model-result cache.
+# The public demo on Render's free plan: a single web service. PostgreSQL and Redis run inside
+# its container, and every start loads the demo data afresh.
 # Deploy with https://render.com/deploy?repo=https://github.com/Shivasaireddy007/docflow-ai
 services:
   - type: web
@@ -12,21 +12,3 @@ services:
     envVars:
       - key: SECRET_KEY
         generateValue: true
-      - key: DATABASE_URL
-        fromDatabase:
-          name: docflow-demo-db
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: keyvalue
-          name: docflow-demo-cache
-          property: connectionString
-
-  - type: keyvalue
-    name: docflow-demo-cache
-    plan: free
-    ipAllowList: []  # reachable only from Render's private network
-
-databases:
-  - name: docflow-demo-db
-    plan: free

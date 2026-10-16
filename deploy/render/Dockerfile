@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
-# The public demo: one container serving the API and the built review app, with the reviewed
-# receipts loaded at start. Build from the repository root:
+# The public demo: one container serving the API and the built review app, with its own
+# PostgreSQL and Redis and the reviewed receipts loaded at start. Build from the repository root:
 #   docker build -f deploy/render/Dockerfile .
 
 FROM node:24-alpine AS web
@@ -25,6 +25,10 @@ FROM python:3.12-slim
 ENV PYTHONUNBUFFERED=1 PATH="/app/.venv/bin:$PATH" \
     WEB_DIR=/app/web DEMO_MODE=true SECURE_COOKIES=true WEB_CONCURRENCY=2 \
     LOGIN_RATE=120/2
+# PostgreSQL and Redis run inside the container: the demo reloads its data on every start, so
+# nothing needs to outlive it, and it fits in a single free web service.
+RUN apt-get update && apt-get install -y --no-install-recommends postgresql redis-server \
+    && rm -rf /var/lib/apt/lists/*
 RUN useradd --system --uid 10001 --home /app app
 WORKDIR /app
 COPY --from=build --chown=10001:10001 /app /app

@@ -210,8 +210,8 @@ its result into the Django endpoint end to end.
 A read-only copy with 15 receipts from both datasets, read by the real models ahead of time:
 approve, correct or reject them as a reviewer would (the sign-in is filled in). Uploads are off,
 since the free host has no GPU for the models. It runs on Render's free plan from
-[`render.yaml`](render.yaml): one container serving the API and the review app, PostgreSQL and
-Key Value; every start reloads the demo data, so it resets after each sleep.
+[`render.yaml`](render.yaml): one container serving the API and the review app, with its own
+PostgreSQL and Redis inside; every start reloads the demo data, so it resets after each sleep.
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Shivasaireddy007/docflow-ai)
 
