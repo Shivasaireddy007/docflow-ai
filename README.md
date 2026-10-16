@@ -18,8 +18,8 @@ models read it (OCR), extract its fields, and score each field's confidence with
 verify. Versioned rules approve what they can; everything else goes to a review queue where a
 person corrects and decides, with every step in an append-only audit trail.
 
-**On the 100 labelled receipts of the CORD test set: 52% approved automatically with no wrong
-total among them, and every one of the 14 wrong totals sent to a person**
+**On 191 labelled receipts from two public datasets: 52% approved automatically with no wrong
+total among them, and every wrong total sent to a person**
 ([evaluation](docs/evaluation/README.md)).
 
 ![A reviewer corrects a total the model got wrong: it took the subtotal, and the arithmetic check flagged it](docs/media/review.gif)
@@ -43,6 +43,7 @@ Built in stages; each is complete and tested before the next starts.
 | 3 | Content-addressed result cache, rate limiting, tracing, evaluation on a labelled public dataset | ✅ Done |
 | 4 | AWS with Terraform: Step Functions and container Lambdas, DynamoDB, KMS, canary deploys, SLO alarms ([infra](infra/README.md)) | ✅ Built and tested in CI; deploying needs an AWS account |
 | 5 | Serving benchmark for the OCR model ([bench](bench/README.md)) | ✅ Laptop baseline; the vLLM run needs a rented GPU |
+| 6 | A second dataset (SROIE), calibration, AWS results reported back to the review app, Prometheus and Grafana, load test, public demo, [decision records](docs/adr/README.md) | ✅ Done |
 
 ## How it works
 
@@ -65,25 +66,50 @@ Every step is written to an append-only audit trail.
 
 ## Results
 
-From [the evaluation](docs/evaluation/README.md) on the 100 receipts of the
-[CORD](https://huggingface.co/datasets/naver-clova-ix/cord-v2) test set (real photos: crumpled,
-shadowed, store details blurred), with `qwen2.5vl:3b` for OCR and `qwen2.5:7b` for fields on an
-Apple M5 laptop:
+From [the evaluation](docs/evaluation/README.md), with `qwen2.5vl:3b` for OCR and `qwen2.5:7b` for
+fields on an Apple M5 laptop, on the 100-receipt test sets of two public datasets:
+[CORD](https://huggingface.co/datasets/naver-clova-ix/cord-v2) (Indonesian photos: crumpled,
+shadowed, rupiah without decimals) and [SROIE](https://huggingface.co/datasets/jsdnrs/ICDAR2019-SROIE)
+(Malaysian scans, ringgit with cents).
 
-| Judged on the total | Prompt 1 | Prompt 2 (default) |
+| Judged on the total | CORD | SROIE |
 |---|---|---|
-| Totals extracted correctly | 76% | **85%** |
-| Approved automatically | 42% | **52%** |
-| Wrong totals among the auto-approved | 0 | **0** |
-| Wrong totals sent to a person | 22 of 22 | 14 of 14 |
+| Totals extracted correctly | 82% | **96%** |
+| Approved automatically | 53% | 52% |
+| Wrong totals among the auto-approved | **0** | **0** |
+| Wrong totals sent to a person | 16 of 16 | 4 of 4 |
 
-Prompt 2 came from reading prompt 1's mistakes: totals printed as `DUE`, the CASH amount taken as
-the total, labels and amounts in separate columns. It added cash and change to the extracted
-fields, which gives the checks a second equation (total = cash − change). Re-evaluating it re-ran
-only extraction: OCR results came from the cache. About 24 s per receipt on the laptop; a document
-processed before by the same versions takes under a millisecond.
+How it got there, each step measured:
+
+- **Prompt 2** came from reading prompt 1's mistakes on CORD (totals printed as `DUE`, the CASH
+  amount taken as the total) and added cash and change, a second equation for the checks
+  (total = cash − change). Totals right: 76% → 85%; auto-approved 42% → 52%.
+- **A second dataset found what the first couldn't.** On SROIE, prompt 2 read `38.90` as 3890:
+  49% of totals right. The checks still sent every wrong one to a person. Prompt 3 says how to
+  tell a decimal point from a thousands separator: 96%, with CORD unchanged within noise.
+- **The same run exposed a bug in the checks.** `RM193.00` wasn't recognised as 193, so correct
+  totals went to review; fixed, SROIE auto-approval went from 13% to 52%, still with no wrong total.
+- **Fitted confidence didn't generalise.** A logistic regression on the checks, fitted on CORD,
+  was better calibrated on CORD but worse on SROIE (calibration error 0.107 against 0.043), so the
+  hand-set penalties stay ([calibration](docs/evaluation/calibration/README.md)).
+
+About 24 s per receipt on the laptop; a document processed before by the same versions takes
+under a millisecond, from the cache.
+
+## Monitoring and load
+
+Prometheus metrics from the API and workers (documents by outcome, step and model times, cache hit
+rate, API latency by route, rate-limited requests, reviews) and a provisioned Grafana dashboard,
+both in Docker Compose. Under a [k6 load test](bench/load/README.md) mixing uploads across tenants,
+reviewer reads and one tenant bursting past its limit: reads p95 7.5 ms, uploads p95 11.4 ms,
+upload to decision p95 under a second, and only the bursting tenant refused.
+
+![Grafana during the load test](docs/images/grafana.png)
 
 ## Design decisions
+
+The main choices are written up as [decision records](docs/adr/README.md): context, decision,
+consequences and the alternatives considered.
 
 ### Pipeline
 
@@ -93,7 +119,7 @@ processed before by the same versions takes under a millisecond.
   subtotal; subtotal + tax + service − discount = total). A document is only as confident as its
   weakest field, and a receipt without a total is never auto-approvable.
 - **Matching numbers the way receipts print them.** 56100 is found as `56.100`, `56,100`,
-  `56 100` or `Rp56100`, but never inside another number (`500` in `12,500`) or glued to the
+  `56 100` or `Rp56100`, and 193 as `RM193.00`, but never inside another number (`500` in `12,500`) or glued to the
   number in the next column.
 - **Deterministic, constrained models.** Temperature 0 and a fixed seed, so the same document
   gives the same result; extraction output is constrained to a JSON schema; output length is capped
@@ -173,6 +199,22 @@ alarm guards cost. CI checks it all without an AWS account: `terraform test` aga
 provider, the state machine in Step Functions Local, the handlers against moto, and the Lambda
 image invoked locally.
 
+The review app stays the system of record ([ADR 5](docs/adr/0005-django-system-of-record.md)):
+with `PROCESSING_BACKEND=stepfunctions`, uploads go to S3, the state machine runs the models, and
+its last step posts the result to the app over an HMAC-signed callback, where the tenant's rules
+decide and reviewers see it in the queue. A test runs the Lambda chain against moto and delivers
+its result into the Django endpoint end to end.
+
+## Public demo
+
+A read-only copy with 15 receipts from both datasets, read by the real models ahead of time:
+approve, correct or reject them as a reviewer would (the sign-in is filled in). Uploads are off,
+since the free host has no GPU for the models. It runs on Render's free plan from
+[`render.yaml`](render.yaml): one container serving the API and the review app, PostgreSQL and
+Key Value; every start reloads the demo data, so it resets after each sleep.
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Shivasaireddy007/docflow-ai)
+
 ## API
 
 Authenticate with `Authorization: Api-Key <key>`. Interactive docs at `/api/docs/`; the spec is in
@@ -219,10 +261,10 @@ curl -H "Authorization: Api-Key <key>" -F "file=@receipt.jpg" http://127.0.0.1:8
 cd frontend && npm ci && npm run dev
 ```
 
-Evaluate on the labelled CORD receipts (downloads them once):
+Evaluate on labelled receipts (downloads them once):
 
 ```bash
-cd backend && uv run python -m evaluation.run --limit 100 --out ../docs/evaluation/my-run
+cd backend && uv run python -m evaluation.run --dataset cord --limit 100 --out ../docs/evaluation/my-run
 ```
 
 ### With Docker
@@ -241,7 +283,7 @@ cd backend && uv run pytest && uv run ruff check . && uv run mypy .
 cd frontend && npm test && npm run typecheck && npm run lint
 ```
 
-CI runs four jobs on every push:
+CI runs five jobs on every push:
 
 - **backend:** ruff, strict mypy, tests against PostgreSQL and Redis, no missing migrations, an
   up-to-date API spec.
@@ -251,6 +293,8 @@ CI runs four jobs on every push:
 - **stack:** the whole Docker Compose stack with a stand-in for the models, an API smoke test,
   then a Playwright test where an admin tightens a rule, uploads a receipt, and reviews what the
   rule sends to the queue.
+- **demo:** the public demo image built and started, its pages served, the demo sign-in working
+  and uploads refused.
 
 ## License
 
